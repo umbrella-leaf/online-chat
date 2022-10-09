@@ -234,7 +234,7 @@ const sendVerifyCode = () => {
           }
         })
         .catch(() => {
-          ReportErrorMessage();
+          ReportErrorMessage(error);
         })
     }
   })
@@ -272,12 +272,12 @@ const SignUp = (value) => {
               }
             })
             .catch(error => {
-              ReportErrorMessage();
+              ReportErrorMessage(error);
             })
         }
       })
       .catch(error => {
-        ReportErrorMessage();
+        ReportErrorMessage(error);
       })
   }
 }

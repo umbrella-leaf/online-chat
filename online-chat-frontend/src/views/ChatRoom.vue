@@ -6,13 +6,13 @@
           <a-card class="userinfo">
             <a-card-meta>
               <template #avatar>
-                <a-avatar src="https://joeschmoe.io/api/v1/random"></a-avatar>
+                <a-avatar :src="UserInfo.avatar_url"></a-avatar>
               </template>
               <template #title>
-                伤心太平洋
+                {{ UserInfo.nickname || UserInfo.username }}
               </template>
               <template #description>
-                <span>我只爱你，You R My Super Star</span>
+                <span>{{ UserInfo.signature }}</span>
               </template>
             </a-card-meta>
           </a-card>
@@ -83,6 +83,8 @@ import {createFromIconfontCN} from '@ant-design/icons-vue';
 import {useStore} from "vuex";
 import MessageFrame from '../components/Widgets/MessageFrame';
 import InputFrame from '../components/Widgets/InputFrame';
+import {apiGetInfo} from "@/apis/user/get-info";
+import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
 
 const store = useStore();
 const FontIcons = createFromIconfontCN({
@@ -134,6 +136,20 @@ const sessions = ref([
     latest_msg_time: '10: 07'
   }
 ])
+
+
+const UserInfo = ref({});
+apiGetInfo()
+  .then(response => {
+    ResponseToMessage(response, false);
+    if (response.data.status === 200) {
+      UserInfo.value = response.data.data;
+    }
+  })
+  .catch(error => {
+    console.log(error);
+    ReportErrorMessage(error);
+  })
 
 </script>
 

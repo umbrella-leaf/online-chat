@@ -96,7 +96,7 @@ const SignIn = (value) => {
       }
     })
     .catch(error => {
-      ReportErrorMessage();
+      ReportErrorMessage(error);
     })
 }
 const validFailed = ({values, errorFields, outOfDate}) => {

@@ -7,10 +7,10 @@
             <a-breadcrumb-item>
               <router-link to="/">Pages</router-link>
             </a-breadcrumb-item>
-            <a-breadcrumb-item>{{ router.name }}</a-breadcrumb-item>
+            <a-breadcrumb-item>{{ route.name }}</a-breadcrumb-item>
           </a-breadcrumb>
           <div class="ant-page-header-heading">
-            <span class="ant-page-header-heading-title">{{ router.name }}</span>
+            <span class="ant-page-header-heading-title">{{ route.name }}</span>
           </div>
         </a-col>
 
@@ -65,10 +65,16 @@
             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg>
           </a-button>
           <router-link to="/sign-in" class="btn-sign-in" @click="e => e.preventDefault()">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10ZM12 7C12 8.10457 11.1046 9 10 9C8.89543 9 8 8.10457 8 7C8 5.89543 8.89543 5 10 5C11.1046 5 12 5.89543 12 7ZM9.99993 11C7.98239 11 6.24394 12.195 5.45374 13.9157C6.55403 15.192 8.18265 16 9.99998 16C11.8173 16 13.4459 15.1921 14.5462 13.9158C13.756 12.195 12.0175 11 9.99993 11Z" fill="#111827"/>
-            </svg>
-            <span>Sign In</span>
+            <a-dropdown :trigger="['hover', 'click']"
+                        :get-popup-container="() => wrapper">
+              <a-avatar shape="circle" :src="avatar_url">
+              </a-avatar>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item><a href="#" @click="SignOut">登出</a></a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
           </router-link>
 
           <a-input-search class="header-search"
@@ -89,10 +95,28 @@
 <script setup>
 import {computed, ref} from "vue";
 import {onMounted, onUnmounted} from "vue";
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
+import {useStore} from "vuex";
 import Bus from '@/utils/EventBus';
+import {apiGetAvatar} from "@/apis/user/get-avatar";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 
-const router = useRoute();
+const route = useRoute();
+const store = useStore();
+const router = useRouter();
+
+const avatar_url = ref('');
+apiGetAvatar()
+  .then(response => {
+    ResponseToMessage(response, false);
+    if (response.data.status === 200) {
+      avatar_url.value = response.data.data;
+    }
+  })
+  .catch(error => {
+    console.log(error);
+    ReportErrorMessage(error);
+  })
 
 const props = defineProps({
   // Header固定状态
@@ -161,6 +185,12 @@ const openSettingsDrawer = () => {
 const toggleSideBar = () => {
   Bus.$emit('toggleSideBar', !sidebarCollapsed.value);
   resizeEventHandler();
+}
+// 登出
+const SignOut = (e) => {
+  e.preventDefault();
+  store.commit('user/deleteToken');
+  router.push('/sign-in');
 }
 
 
