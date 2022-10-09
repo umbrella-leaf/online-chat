@@ -563,17 +563,9 @@
 			margin: 0;
 			box-shadow: none;
 			color: $color-gray-7;
-			svg {
-				margin-right: 4px;
-			}
-			span {
-				font-weight: $fw-semibold;
-				vertical-align: middle;
-				display: none;
-
-				@media( min-width: $md ){
-					display: inline;
-				}
+			img {
+				width: 32px;
+				height: 32px;
 			}
 		}
 		svg {
