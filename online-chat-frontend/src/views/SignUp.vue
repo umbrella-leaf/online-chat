@@ -65,7 +65,7 @@
       </a-input-search>
     </a-form-item>
     <a-form-item :wrapper-col="{offset: 3, span: 18}">
-      <a-button type="primary" html-type="submit">登录</a-button>
+      <a-button type="primary" html-type="submit">注册</a-button>
       <a-button type="primary" danger @click="resetForm">重置</a-button>
     </a-form-item>
   </a-form>
@@ -79,9 +79,16 @@ import {useStore} from "vuex";
 import Bus from '@/utils/EventBus';
 import ToolTip from "@/components/Utils/ToolTip";
 import {message} from "ant-design-vue";
+import md5 from "js-md5";
+import {apiSignUp} from "@/apis/entrance/sign-up";
+import {apiSendCode} from "@/apis/entrance/send-code";
+import {apiSendEmail} from "@/apis/entrance/send-email";
+import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
+import {useRouter} from "vue-router";
 
 
 const store = useStore();
+const router = useRouter();
 
 
 // 验证码发送计时器
@@ -175,15 +182,11 @@ const checkVerifyCode = async(_rule, value) => {
 }
 
 
-// 生成验证码，包括大写、小写字母以及数字,digits为位数
+// 生成验证码,digits为位数
 const generateVerifyCode = (digits) => {
   let verifyCode = "";
   for (let i = 0;i < digits;i++) {
-    // arr中三个字符依次为随机生成的大写字母、小写字母和数字
-    let arr = [String.fromCharCode(Math.round(Math.random() * 25 + 97)),
-      String.fromCharCode(Math.round(Math.random() * 25 + 65)),
-      String.fromCharCode(Math.round(Math.random() * 9 + 48))];
-    verifyCode += arr[Math.round(Math.random() * 2)];
+    verifyCode += Math.floor(Math.random() * 10);
   }
   return verifyCode;
 }
@@ -204,27 +207,35 @@ const sendVerifyCode = () => {
         message.warning(`请等待${duration}秒后重新发送！`);
         return;
       }
-      // 发送验证码
-      const send = {}
-      message.success('验证码发送成功！');
-      send.verifyCode = generateVerifyCode(6);
-      send.telephone = FormState.telephone;
-      // 提交到vuex，以避免频繁发送验证码，以及判断验证码是否过期
-      const phone = FormState.telephone;
-      const code = send.verifyCode;
-      Bus.$emit('updateLastCodeVerify', {phone, code, time});
-      // 设置验证码发送计时器以及按钮
-      verifyCodeTimer.disabled = true;
-      verifyCodeTimer.count = TIME_COUNT;
-      verifyCodeTimer.timer = setInterval(() => {
-        if (verifyCodeTimer.count > 0 && verifyCodeTimer.count <= TIME_COUNT) {
-          verifyCodeTimer.count -= 1;
-        } else {
-          verifyCodeTimer.disabled = false;
-          clearInterval(verifyCodeTimer.timer);
-          verifyCodeTimer.timer = null;
-        }
-      }, 1000);
+      const params = {
+        verifyCode: generateVerifyCode(6).toString(),
+        telephone: FormState.telephone.toString()
+      }
+      apiSendCode(params)
+        .then(response => {
+          ResponseToMessage(response);
+          if (response.data.status === 200) {
+            // 提交到vuex，以避免频繁发送验证码，以及判断验证码是否过期
+            const phone = FormState.telephone;
+            const code = params.verifyCode;
+            Bus.$emit('updateLastCodeVerify', {phone, code, time});
+            // 设置验证码发送计时器以及按钮
+            verifyCodeTimer.disabled = true;
+            verifyCodeTimer.count = TIME_COUNT;
+            verifyCodeTimer.timer = setInterval(() => {
+              if (verifyCodeTimer.count > 0 && verifyCodeTimer.count <= TIME_COUNT) {
+                verifyCodeTimer.count -= 1;
+              } else {
+                verifyCodeTimer.disabled = false;
+                clearInterval(verifyCodeTimer.timer);
+                verifyCodeTimer.timer = null;
+              }
+            }, 1000);
+          }
+        })
+        .catch(() => {
+          ReportErrorMessage();
+        })
     }
   })
   .catch(() => {
@@ -239,7 +250,35 @@ const SignUp = (value) => {
     message.error('验证码过期，请重新发送！');
     Bus.$emit('clearLastCodeVerify', FormState.telephone);
   } else {
-    message.success('注册成功！');
+    const params = {
+      username: FormState.username,
+      password: md5(FormState.password).toUpperCase(),
+      email: FormState.email,
+      telephone: FormState.telephone
+    }
+    apiSignUp(params)
+      .then(response => {
+        ResponseToMessage(response);
+        if (response.data.status === 200) {
+          const params = {
+            email: FormState.email,
+            telephone: FormState.telephone
+          }
+          apiSendEmail(params)
+            .then(response => {
+              ResponseToMessage(response, false);
+              if (response.data.status === 200) {
+                router.push('/sign-in');
+              }
+            })
+            .catch(error => {
+              ReportErrorMessage();
+            })
+        }
+      })
+      .catch(error => {
+        ReportErrorMessage();
+      })
   }
 }
 // 提交失败，报错
