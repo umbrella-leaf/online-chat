@@ -1,0 +1,92 @@
+from flask import Blueprint, request, g, jsonify
+from utils.dbOperation import MySQL
+from utils.Response import Warn, Error, Success
+from utils.Token import Token
+from exts import auth_user, sms, smtp
+
+
+entrance_route = Blueprint('entrance', __name__)
+
+
+@entrance_route.route('/sign-in', methods=['POST'])
+@auth_user.login_required
+def signIn():
+    telephone = g.telephone
+    # 用户状态
+    res = MySQL.getStatus(telephone)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    status = res.data
+    if not status:
+        return jsonify(Warn(message='登录失败，用户未进行邮箱验证！').to_dict())
+
+    # 生成token
+    res = Token.generate_auth_token(telephone)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    token = res.data
+
+    res_data = {'token': token}
+    return jsonify(Success(data=res_data, message='登录成功！').to_dict())
+
+
+@entrance_route.route('/sign-up', methods=['POST'])
+def signUp():
+    # 获取数据
+    username = request.json['username']
+    password = request.json['password']
+    email = request.json['email']
+    telephone = request.json['telephone']
+
+    # 检查手机号是否已被注册
+    res = MySQL.checkTel(telephone)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    if res.data:
+        # 用户状态
+        res = MySQL.getStatus(telephone)
+        if res.status != 200:
+            return jsonify(Error.error.to_dict())
+        status = res.data
+        # 已注册且已验证，直接报错
+        if status == 1:
+            return jsonify(Warn(message='该手机号已被注册！').to_dict())
+        # 已注册未验证，删除原有用户记录
+        else:
+            res = MySQL.delUser(telephone)
+            if res.status != 200:
+                return jsonify(Error.error.to_dict())
+    res = MySQL.addUser(username, email, password, telephone)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    return jsonify(Success(message='注册成功，请尽快前往邮箱验证！').to_dict())
+
+
+@entrance_route.route('/send-code', methods=['POST'])
+def sendVerifyCode():
+    verifyCode = request.json['verifyCode']
+    telephone = request.json['telephone']
+    # 发送验证码
+    res = sms.SendVerifyCode(verifyCode, telephone)
+    if res.status != 200:
+        return jsonify(Error(message="验证码发送失败！").to_dict())
+    else:
+        if res.data:
+            return jsonify(Success(message="验证码发送成功！").to_dict())
+        else:
+            return jsonify(Warn(message="该号码1h内发送次数太多！").to_dict())
+
+
+@entrance_route.route('/send-email', methods=['POST'])
+def sendVerifyEmail():
+    email = request.json['email']
+    telephone = request.json['telephone']
+    # 发送验证邮件
+    res = smtp.SendVerifyEmail(email, telephone)
+    if res.status != 200:
+        return jsonify(Error(message="邮件发送出错！").to_dict())
+    else:
+        if res.data:
+            return jsonify(Success(message="邮件发送成功！").to_dict())
+        else:
+            return jsonify(Error(message="邮件发送失败！").to_dict())

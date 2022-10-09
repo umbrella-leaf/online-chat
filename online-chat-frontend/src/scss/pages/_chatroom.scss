@@ -1,0 +1,197 @@
+.chatroom {
+  background-color: #FFE4C4;
+  height: 650px;
+  border-radius: 8px !important;
+  .chatroom-left {
+    .ant-avatar {
+      border: 2px solid #c0c0c0;
+    }
+    .userinfo {
+      border: none;
+      border-radius: 0;
+      box-shadow: none !important;
+      background: transparent;
+      .ant-card-meta-avatar {
+        .ant-avatar {
+          width: 70px;
+          height: 70px;
+          background-color: $color-gray-2;
+          box-shadow: $shadow-2;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+      .ant-card-meta-detail {
+        display: flex;
+        flex-direction: column;
+        .ant-card-meta-title {
+          margin-top: 5px;
+          line-height: normal;
+          font-size: 20px;
+        }
+        .ant-card-meta-description {
+          color: $color-gray-7;
+          font-size: 16px;
+          //font-weight: $fw-semibold;
+          span {
+            vertical-align: middle;
+          }
+        }
+      }
+      &:hover {
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09) !important;
+
+      }
+    }
+
+    .search-input {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      .ant-input-group {
+        width: 100%;
+      }
+      .ant-input {
+        height: 40px;
+      }
+      .ant-btn-icon-only {
+        height: 40px;
+        width: 30px;
+      }
+      .ant-btn {
+        height: 40px;
+        font-size: 16px;
+      }
+    }
+
+    .sessions-list {
+      margin-top: 20px;
+      background: #ffffff;
+      height: 420px;
+      overflow-y: scroll;
+      .ant-list-items {
+        .ant-list-item:hover {
+          position: relative;
+          z-index: 1;
+          box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09) !important;
+        }
+        .ant-list-item:last-of-type {
+          margin-bottom: 6px;
+        }
+      }
+      .ant-list-item-meta-avatar{
+        .ant-avatar {
+          width: 54px;
+          height: 54px;
+          background-color: $color-gray-2;
+          box-shadow: $shadow-2;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+      .ant-list-item-meta-content {
+        display: flex;
+        flex-direction: column;
+        .ant-list-item-meta-title {
+          margin-top: 5px;
+          line-height: normal;
+        }
+        .ant-list-item-meta-description {
+          margin-top: 5px;
+          color: $color-gray-7;
+          font-size: 13px;
+          //font-weight: $fw-semibold;
+          span {
+            vertical-align: middle;
+          }
+        }
+      }
+      .ant-list-item-action {
+        .session-right {
+          height: 57px;
+          justify-content: space-between;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 14px;
+          .msg_read {
+            background-color: #87d068;
+          }
+          .msg_unread {
+            background-color: #ffffff;
+          }
+          span {
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+
+  .chatroom-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    >.ant-card {
+      border-radius: 0;
+      width: 95%;
+      height: 98%;
+    }
+    .ant-card-grid {
+      padding: 0;
+    }
+    .ant-card-grid:not(.ant-card-loading) .ant-card-body {
+      padding: 14px;
+    }
+    .userinfo {
+      border: none;
+      border-radius: 0;
+      box-shadow: none !important;
+      .ant-card-meta-avatar {
+        .ant-avatar {
+          width: 70px;
+          height: 70px;
+          background-color: $color-gray-2;
+          box-shadow: $shadow-2;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+      .ant-card-meta-detail {
+        display: flex;
+        flex-direction: column;
+
+        .ant-card-meta-title {
+          font-size: 20px;
+          margin-top: 5px;
+          line-height: normal;
+        }
+
+        .ant-card-meta-description {
+          color: $color-gray-7;
+          font-size: 16px;
+          //font-weight: $fw-semibold;
+          span {
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .userinfo-right {
+        float: right;
+        display: flex;
+        width: 13%;
+        justify-content: space-between;
+        svg {
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
+  }
+}
