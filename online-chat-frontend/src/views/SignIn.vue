@@ -36,14 +36,19 @@
 
 <script setup>
 import {computed, reactive, ref} from "vue";
-import {UserOutlined, LockOutlined, InfoCircleOutlined} from '@ant-design/icons-vue';
+import {UserOutlined, LockOutlined} from '@ant-design/icons-vue';
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 import {message} from "ant-design-vue";
 import Bus from '@/utils/EventBus';
 import ToolTip from '@/components/Utils/ToolTip';
+import {apiSignIn} from "@/apis/entrance/sign-in";
+import md5 from 'js-md5';
+import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
 
 
 const store = useStore();
+const router = useRouter();
 const rememberMe = computed({
   get() {
     return store.state.entrance.rememberMe;
@@ -78,7 +83,21 @@ const resetForm = () => {
   formRef.value.resetFields();
 }
 const SignIn = (value) => {
-  message.success('登录成功！');
+  const params = {
+    username: FormState.telephone.toString(),
+    password: md5(FormState.password).toUpperCase()
+  };
+  apiSignIn(params)
+    .then(response => {
+      ResponseToMessage(response);
+      if (response.data.status === 200) {
+        store.commit('user/updateToken', response.data.data['token']);
+        router.push('/chatroom');
+      }
+    })
+    .catch(error => {
+      ReportErrorMessage();
+    })
 }
 const validFailed = ({values, errorFields, outOfDate}) => {
   message.error('请检查输入！');
