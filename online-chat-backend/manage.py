@@ -19,7 +19,7 @@ db.create_all(app=app)
 app.register_blueprint(entrance_route, url_prefix='/')
 app.register_blueprint(user_route, url_prefix='/user')
 
-CORS(app)
+CORS(app, supports_credentials=True)
 
 
 # 用户名和密码验证
