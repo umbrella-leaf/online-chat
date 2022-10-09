@@ -1,13 +1,13 @@
 import httpRequest from '@/apis/index'
 
-interface SendCodeParam {
-    verifyCode: string,
+interface SendEmailParam {
+    email: string,
     telephone: string
 }
 
-export function apiSendCode(param: SendCodeParam) {
+export function apiSendEmail(param: SendEmailParam) {
     return httpRequest({
-        url: '/send-code',
+        url: '/send-email',
         method: 'post',
         data: param
     })

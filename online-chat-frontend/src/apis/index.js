@@ -1,10 +1,8 @@
 import axios from "axios";
-import {useStore} from "vuex";
-import {useRouter} from "vue-router";
+import store from "@/store";
+import router from "@/router";
 import {message} from "ant-design-vue";
 
-const store = useStore();
-const router = useRouter();
 
 // 创建一个axios实例
 const service = axios.create({
