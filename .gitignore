@@ -14,7 +14,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor directories and files
-__pycache__
+*.pyc
 .idea
 .vscode
 *.suo
