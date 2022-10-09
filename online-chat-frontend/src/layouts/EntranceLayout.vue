@@ -13,7 +13,7 @@
 
 <script setup>
 import {onMounted, ref} from "vue";
-import {useRouter} from "vue-router";
+import {onBeforeRouteUpdate, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import Bus from "@/utils/EventBus";
 
@@ -64,6 +64,10 @@ const resetActiveTab = (route) => {
 // 重置TabActiveKey
 const route = router.currentRoute.value.fullPath;
 resetActiveTab(route);
+// 监听路由变化
+onBeforeRouteUpdate((to) => {
+  resetActiveTab(to.path);
+});
 
 </script>
 
