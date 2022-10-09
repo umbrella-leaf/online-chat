@@ -28,7 +28,7 @@ class SMTP:
             msg['From'] = formataddr(("Online-chat在线聊天室", self.mail_user))
             msg['To'] = formataddr(("您", email))
             msg['Subject'] = "Online-chat在线聊天室用户激活邮件"
-
+            # 发送邮件
             server = smtplib.SMTP_SSL(self.mail_host, self.mail_post)
             server.login(self.mail_user, self.mail_pass)
             res = server.sendmail(self.mail_user, email, msg.as_string())
