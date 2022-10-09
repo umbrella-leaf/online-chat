@@ -1,7 +1,8 @@
 export const user = {
   namespaced: true,
   state: () => ({
-    token: null
+    token: null,
+    avatar_url: null
   }),
   getters: {
 
@@ -10,8 +11,14 @@ export const user = {
     updateToken(state, value) {
       state.token = value;
     },
-    deleteToken(state, value) {
+    deleteToken(state) {
       state.token = null;
+    },
+    updateAvatarUrl(state, value) {
+      state.avatar_url = value;
+    },
+    deleteAvatarUrl(state) {
+      state.avatar_url = null;
     }
   },
   actions: {
