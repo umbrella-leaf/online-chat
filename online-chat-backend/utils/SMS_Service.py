@@ -54,5 +54,5 @@ class SMS:
 
 if __name__ == '__main__':
     sms = SMS()
-    sms.SendVerifyCode('1234', '11111111111')
+    sms.SendVerifyCode('1234', '13632825509').to_dict()
 
