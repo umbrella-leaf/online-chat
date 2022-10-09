@@ -20,7 +20,7 @@ class SMTP:
             <p>尊敬的Online-chat新用户：</p>
             <p>您好！</p>
             <p>感谢您注册Online-chat在线聊天室服务，请
-            <a href='http://127.0.0.1:5000/user/changeStatus?telephone={telephone}'>点击</a>
+            <a href='http://127.0.0.1:5000/user/change-status?telephone={telephone}'>点击</a>
             该链接进行账户激活！</p>
             <p>感谢您的配合！</p>
             """
