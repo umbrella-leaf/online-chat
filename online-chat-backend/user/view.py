@@ -28,12 +28,14 @@ def getUserInfo():
 @auth_token.login_required
 def getUserAvatar():
     telephone = g.telephone
+    # 检查手机号是否注册
     res = MySQL.checkTel(telephone)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     # 如果没有，则报错
     if not res.data:
         return jsonify(Error(message="找不到该用户！").to_dict())
+    # 获取用户头像
     res = MySQL.getAvatarUrl(telephone)
     if res.status != 200:
         return jsonify(Error.error.to_dict())

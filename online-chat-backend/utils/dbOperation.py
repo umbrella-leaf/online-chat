@@ -46,7 +46,8 @@ class MySQL:
     def getUserInfo(telephone) -> Response:
         try:
             user = User.query.filter_by(telephone=telephone).first()
-            return Success(data={'user_name': user.user_name,
+            return Success(data={'id': user.user_id,
+                                 'username': user.user_name,
                                  'nickname': user.nickname,
                                  'signature': user.signature,
                                  'avatar_url': user.avatar_url})
@@ -99,6 +100,8 @@ class MySQL:
         except pymysql.err as e:
             MySQL.errOut(e)
             return Error()
+
+
 
 
 
