@@ -12,6 +12,9 @@ export function ResponseToMessage(response, need_suc=true) {
   }
 }
 
-export function ReportErrorMessage() {
+export function ReportErrorMessage(error) {
+  if (error === 'token expired' || error === 'token error') {
+    return;
+  }
   message.error('请求发送出错！');
 }

@@ -34,14 +34,17 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   function (response) {
-    const {status, msg} = response.data;
+    const {status, message: msg} = response.data;
     if (status === 300 && msg === 'token expired') {
       message.warning('登录过期，请重新登录！');
       store.commit('user/deleteToken');
       router.push('/sign-in');
+      return Promise.reject('token expired');
     } else if (status === 400 && msg === 'token error') {
       message.error('token错误，无访问权限！');
+      store.commit('user/deleteToken');
       router.push('/sign-in');
+      return Promise.reject('token error');
     }
     return response;
   },
