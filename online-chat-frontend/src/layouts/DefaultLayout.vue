@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import {useStore} from 'vuex';
 import {useState} from "@/utils/hooks/useState";
@@ -91,6 +91,13 @@ const {sidebarCollapsed, sidebarColor, sidebarTheme, navbarFixed, showSettingsDr
 
 // Sets layout's element's class based on route's meta data.
 const layoutClass = computed(() => router.meta.layoutClass);
+onUnmounted(() => {
+  Bus.$off('toggleSidebar');
+  Bus.$off('toggleSettingsDrawer');
+  Bus.$off('toggleNavbarPosition');
+  Bus.$off('updateSidebarTheme');
+  Bus.$off('updateSidebarColor');
+})
 
 </script>
 

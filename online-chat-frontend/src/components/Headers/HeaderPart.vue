@@ -98,25 +98,15 @@ import {onMounted, onUnmounted} from "vue";
 import {useRoute, useRouter} from 'vue-router';
 import {useStore} from "vuex";
 import Bus from '@/utils/EventBus';
-import {apiGetAvatar} from "@/apis/user/get-avatar";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 
 const route = useRoute();
 const store = useStore();
 const router = useRouter();
 
-const avatar_url = ref('');
-apiGetAvatar()
-  .then(response => {
-    ResponseToMessage(response, false);
-    if (response.data.status === 200) {
-      avatar_url.value = response.data.data;
-    }
-  })
-  .catch(error => {
-    console.log(error);
-    ReportErrorMessage(error);
-  })
+const avatar_url = computed(() => {
+  return store.state.user.info.avatar_url;
+});
+
 
 const props = defineProps({
   // Header固定状态
@@ -190,6 +180,7 @@ const toggleSideBar = () => {
 const SignOut = (e) => {
   e.preventDefault();
   store.commit('user/deleteToken');
+  store.commit('user/deleteUserInfo');
   router.push('/sign-in');
 }
 

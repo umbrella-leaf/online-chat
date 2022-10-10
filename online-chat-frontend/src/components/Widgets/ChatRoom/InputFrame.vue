@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {createFromIconfontCN} from '@ant-design/icons-vue';
 import {useStore} from "vuex";
@@ -61,6 +61,9 @@ const send = () => {
 
 onMounted(() => {
   textarea_focus();
+})
+onUnmounted(() => {
+  Bus.$off('SendMessage');
 })
 
 </script>

@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {onBeforeRouteUpdate, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import Bus from "@/utils/EventBus";
@@ -68,6 +68,11 @@ resetActiveTab(route);
 onBeforeRouteUpdate((to) => {
   resetActiveTab(to.path);
 });
+onUnmounted(() => {
+  Bus.$off('updateRememberMe');
+  Bus.$off('updateLastCodeVerify');
+  Bus.$off('clearLastCodeVerify');
+})
 
 </script>
 

@@ -7,41 +7,18 @@ from exts import auth_user, auth_token
 user_route = Blueprint('user', __name__)
 
 
+# 获取用户信息
 @user_route.route('/get-info', methods=['GET'])
 @auth_token.login_required
 def getUserInfo():
     telephone = g.telephone
-    # 查询是否有手机号
-    res = MySQL.checkTel(telephone)
-    if res.status != 200:
-        return jsonify(Error.error.to_dict())
-    # 如果没有，则报错
-    if not res.data:
-        return jsonify(Error(message="找不到该用户！").to_dict())
     res = MySQL.getUserInfo(telephone)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(data=res.data, message="获取用户信息成功！").to_dict())
 
 
-@user_route.route('/get-avatar', methods=['GET'])
-@auth_token.login_required
-def getUserAvatar():
-    telephone = g.telephone
-    # 检查手机号是否注册
-    res = MySQL.checkTel(telephone)
-    if res.status != 200:
-        return jsonify(Error.error.to_dict())
-    # 如果没有，则报错
-    if not res.data:
-        return jsonify(Error(message="找不到该用户！").to_dict())
-    # 获取用户头像
-    res = MySQL.getAvatarUrl(telephone)
-    if res.status != 200:
-        return jsonify(Error.error.to_dict())
-    return jsonify(Success(data=res.data, message="获取用户信息成功！").to_dict())
-
-
+# 修改用户验证状态路由
 @user_route.route('/change-status', methods=['GET'])
 def changeStatus():
     telephone = request.args.get('telephone')
@@ -66,4 +43,17 @@ def changeStatus():
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="验证成功，用户现已可正常登录！").to_dict())
+
+
+# 修改用户信息
+@user_route.route('/change-info', methods=['POST'])
+@auth_token.login_required
+def ChangeUserInfo():
+    telephone = g.telephone
+    info_dict = request.json
+    res = MySQL.changeUserInfo(telephone, info_dict)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    return jsonify(Success(message="信息修改成功！").to_dict())
+
 

@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 
 
@@ -58,6 +58,9 @@ const messages = ref([
 
 onMounted(() => {
   msg_list_to_bottom();
+})
+onUnmounted(() => {
+  Bus.$off('SendMessage');
 })
 </script>
 

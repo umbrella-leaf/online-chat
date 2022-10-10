@@ -597,6 +597,10 @@
           padding-right: 11px;
         }
       }
+      .ant-btn-icon-only {
+        width: 40px;
+        height: 40px;
+      }
       &.loading .ant-input:not(:last-child) {
         padding-right: 30px;
       }

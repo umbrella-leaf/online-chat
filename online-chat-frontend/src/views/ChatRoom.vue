@@ -3,66 +3,14 @@
     <a-card bordered class="chatroom">
       <a-row type="flex">
         <a-col :span="24" :md="9" class="chatroom-left">
-          <a-card class="userinfo">
-            <a-card-meta>
-              <template #avatar>
-                <a-avatar :src="UserInfo.avatar_url"></a-avatar>
-              </template>
-              <template #title>
-                {{ UserInfo.nickname || UserInfo.username }}
-              </template>
-              <template #description>
-                <span>{{ UserInfo.signature }}</span>
-              </template>
-            </a-card-meta>
-          </a-card>
+          <UserInfoLeft :UserInfo="UserInfo" />
           <a-input-search class="search-input" placeholder="搜索联系人" v-model:value="keyword" enter-button />
-
-          <a-list bordered item-layout="horizontal" :data-source="sessions" class="sessions-list">
-            <template #renderItem="{item}">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template #avatar>
-                    <a-avatar :src="item.avatar"></a-avatar>
-                  </template>
-                  <template #title>
-                    {{ item.name }}
-                  </template>
-                  <template #description>
-                    <span>{{ item.latest_msg }}</span>
-                  </template>
-                </a-list-item-meta>
-                <template #actions>
-                  <div class="session-right">
-                    <a-avatar class="msg_read" v-if="!item.latest_unread">✔</a-avatar>
-                    <a-avatar class="msg_unread" v-else></a-avatar>
-                    <span>{{item.latest_msg_time}}</span>
-                  </div>
-                </template>
-              </a-list-item>
-            </template>
-          </a-list>
+          <SessionsList :sessions="sessions" />
         </a-col>
         <a-col :span="24" :md="15" class="chatroom-right">
           <a-card >
             <a-card-grid style="width: 100%;" :hoverable="false">
-              <a-card class="userinfo">
-                <a-card-meta>
-                  <template #avatar>
-                    <a-avatar src="https://joeschmoe.io/api/v1/random"></a-avatar>
-                  </template>
-                  <template #title>
-                    夕阳的刻痕
-                    <div class="userinfo-right">
-                      <FontIcons type="icon--MaleUser" />
-                      <FontIcons type="icon-settings" />
-                    </div>
-                  </template>
-                  <template #description>
-                    <span>路明泽不会发现我是他表哥吧</span>
-                  </template>
-                </a-card-meta>
-              </a-card>
+              <UserInfoRight />
             </a-card-grid>
             <a-card-grid style="width: 100%" :hoverable="false">
               <MessageFrame />
@@ -78,19 +26,18 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
-import {createFromIconfontCN} from '@ant-design/icons-vue';
+import {computed, ref} from "vue";
 import {useStore} from "vuex";
-import MessageFrame from '../components/Widgets/MessageFrame';
-import InputFrame from '../components/Widgets/InputFrame';
+import MessageFrame from '../components/Widgets/ChatRoom/MessageFrame';
+import InputFrame from '../components/Widgets/ChatRoom/InputFrame';
 import {apiGetInfo} from "@/apis/user/get-info";
 import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
+import UserInfoLeft from "@/components/Widgets/ChatRoom/UserInfoLeft";
+import SessionsList from "@/components/Widgets/ChatRoom/SessionsList";
+import UserInfoRight from "@/components/Widgets/ChatRoom/UserInfoRight";
+
 
 const store = useStore();
-const FontIcons = createFromIconfontCN({
-  scriptUrl: store.state.urls.icon_font_url
-})
-
 const keyword = ref('');
 const sessions = ref([
   {
@@ -138,18 +85,24 @@ const sessions = ref([
 ])
 
 
-const UserInfo = ref({});
-apiGetInfo()
-  .then(response => {
-    ResponseToMessage(response, false);
-    if (response.data.status === 200) {
-      UserInfo.value = response.data.data;
-    }
-  })
-  .catch(error => {
-    console.log(error);
-    ReportErrorMessage(error);
-  })
+const UserInfo = computed(() => {
+  return store.state.user.info;
+})
+const GetUserInfo = () => {
+  apiGetInfo()
+    .then(response => {
+      ResponseToMessage(response, false);
+      if (response.data.status === 200) {
+        store.commit('user/updateUserInfo', response.data.data);
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
+    })
+
+}
+GetUserInfo();
 
 </script>
 

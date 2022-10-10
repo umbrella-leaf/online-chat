@@ -7,6 +7,8 @@
 // Profile Page
 .user-profile {
 	background-color: #FFE4C4;
+	height: 650px;
+	border-radius: 8px !important;
 	.ant-card-head-title {
 		span {
 			font-weight: 600;
@@ -19,13 +21,29 @@
 				display: flex;
 				justify-content: center;
 			}
-			.ant-avatar {
+			.ant-upload-picture-card-wrapper {
+				display: flex;
+				justify-content: center;
+			}
+			.ant-upload {
+				display: flex;
+				justify-content: center;
 				width: 120px;
 				height: 120px;
 			}
+			.ant-avatar {
+				width: 115px;
+				height: 115px;
+			}
+		}
+		.submit-item {
+			.ant-form-item-control-input-content {
+				display: flex;
+				justify-content: space-evenly;
+			}
 		}
 		.ant-form-item {
-			margin-bottom: 36px;
+			margin-bottom: 28px;
 		}
 	}
 }

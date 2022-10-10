@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from utils.SMS_Service import SMS
 from utils.SMTP_service import SMTP
+from utils.COS_service import COS
 
 db = SQLAlchemy()
 
@@ -14,4 +15,7 @@ sms = SMS()
 
 # 初始化SMTP对象
 smtp = SMTP()
+
+# 初始化COS对象
+cos = COS()
 

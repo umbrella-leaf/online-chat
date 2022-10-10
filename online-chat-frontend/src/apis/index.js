@@ -35,14 +35,18 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   function (response) {
     const {status, message: msg} = response.data;
+    // token过期
     if (status === 300 && msg === 'token expired') {
       message.warning('登录过期，请重新登录！');
       store.commit('user/deleteToken');
+      store.commit('user/deleteUserInfo');
       router.push('/sign-in');
       return Promise.reject('token expired');
     } else if (status === 400 && msg === 'token error') {
+      // token错误
       message.error('token错误，无访问权限！');
       store.commit('user/deleteToken');
+      store.commit('user/deleteUserInfo');
       router.push('/sign-in');
       return Promise.reject('token error');
     }

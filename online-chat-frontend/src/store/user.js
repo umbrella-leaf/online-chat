@@ -2,7 +2,7 @@ export const user = {
   namespaced: true,
   state: () => ({
     token: null,
-    avatar_url: null
+    info: {}
   }),
   getters: {
 
@@ -14,11 +14,11 @@ export const user = {
     deleteToken(state) {
       state.token = null;
     },
-    updateAvatarUrl(state, value) {
-      state.avatar_url = value;
+    updateUserInfo(state, info) {
+      state.info = info;
     },
-    deleteAvatarUrl(state) {
-      state.avatar_url = null;
+    deleteUserInfo(state) {
+      state.info = {};
     }
   },
   actions: {

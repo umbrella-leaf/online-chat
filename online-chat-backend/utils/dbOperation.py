@@ -1,7 +1,10 @@
-from exts import db
+import base64
+
+from exts import db, cos
 from user.model import User
 from utils.Response import Response, Success, Error
 from datetime import datetime
+from time import time
 import pymysql
 
 
@@ -27,40 +30,6 @@ class MySQL:
         try:
             user = User.query.filter_by(telephone=telephone).first()
             return Success(data=user is not None)
-        except pymysql.err as e:
-            MySQL.errOut(e)
-            return Error()
-
-    # 查询用户状态（是否已经验证）
-    @staticmethod
-    def getStatus(telephone) -> Response:
-        try:
-            user = User.query.filter_by(telephone=telephone).first()
-            return Success(data=user.status)
-        except pymysql.err as e:
-            MySQL.errOut(e)
-            return Error()
-
-    # 获取用户名和昵称
-    @staticmethod
-    def getUserInfo(telephone) -> Response:
-        try:
-            user = User.query.filter_by(telephone=telephone).first()
-            return Success(data={'id': user.user_id,
-                                 'username': user.user_name,
-                                 'nickname': user.nickname,
-                                 'signature': user.signature,
-                                 'avatar_url': user.avatar_url})
-        except pymysql.err as e:
-            MySQL.errOut(e)
-            return Error()
-
-    # 查询用户头像地址
-    @staticmethod
-    def getAvatarUrl(telephone) -> Response:
-        try:
-            user = User.query.filter_by(telephone=telephone).first()
-            return Success(data=user.avatar_url)
         except pymysql.err as e:
             MySQL.errOut(e)
             return Error()
@@ -101,8 +70,73 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
+    # 查询用户状态（是否已经验证）
+    @staticmethod
+    def getStatus(telephone) -> Response:
+        try:
+            user = User.query.filter_by(telephone=telephone).first()
+            return Success(data=user.status)
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
 
+    # 获取用户信息
+    @staticmethod
+    def getUserInfo(telephone) -> Response:
+        try:
+            user = User.query.filter_by(telephone=telephone).first()
+            return Success(data={'id': user.user_id,
+                                 'username': user.user_name,
+                                 'nickname': user.nickname,
+                                 'signature': user.signature,
+                                 'telephone': user.telephone,
+                                 'avatar_url': user.avatar_url})
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
 
+    # 查询用户头像地址
+    @staticmethod
+    def getAvatarUrl(telephone) -> Response:
+        try:
+            user = User.query.filter_by(telephone=telephone).first()
+            return Success(data=user.avatar_url)
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
+
+    # 处理并上传用户头像
+    @staticmethod
+    def ProcessUserAvatar(telephone, avatar_base64: str):
+        # 如果图像地址是base64格式，获取其有效数据
+        ext_begin = avatar_base64.find('/')
+        ext_end = avatar_base64.find(";", ext_begin)
+        ext = avatar_base64[ext_begin + 1:ext_end]
+        if avatar_base64.find('base64') != -1:
+            avatar_name = f"/avatar/{telephone}/{telephone}.{ext}"
+            b = base64.b64decode(avatar_base64[ext_end + 8:])
+            cos.upload_object(b, avatar_name)
+            avatar_url = f"{cos.get_object_url(avatar_name)}?timestamp={int(time())}"
+        else:
+            if avatar_base64.find('?') != -1:
+                avatar_url = f"{avatar_base64.split('?')[0]}?timestamp={int(time())}"
+            else:
+                avatar_url = f"{avatar_base64}?timestamp={int(time())}"
+        return avatar_url
+
+    # 修改用户信息
+    @staticmethod
+    def changeUserInfo(telephone, info_dict) -> Response:
+        try:
+            avatar_base64 = info_dict["avatar_url"]
+            avatar_url = MySQL.ProcessUserAvatar(telephone, avatar_base64)
+            info_dict["avatar_url"] = avatar_url
+            User.query.filter_by(telephone=telephone).update(info_dict)
+            db.session.commit()
+            return Success()
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
 
 
 

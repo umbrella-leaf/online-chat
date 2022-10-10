@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, g, request, make_response
+from flask_socketio import SocketIO
 from flask_cors import CORS
 from utils.Response import Success, Warn, Error
 from utils.Token import Token
@@ -15,11 +16,14 @@ app.config.from_object(config)
 app.secret_key = '\xc9ixnRb\xe40\xd4\xa5\x7f\x03\xd0y6\x01\x1f\x96\xeao+\x8a\x9f\xe4'
 db.init_app(app)
 db.create_all(app=app)
-
+# 注册蓝图
 app.register_blueprint(entrance_route, url_prefix='/')
 app.register_blueprint(user_route, url_prefix='/user')
-
+# 初始化CORS跨域模块
 CORS(app, supports_credentials=True)
+# 为app绑定webSocket
+socketio = SocketIO()
+socketio.init_app(app)
 
 
 # 用户名和密码验证
@@ -65,4 +69,5 @@ def token_error():
 
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)

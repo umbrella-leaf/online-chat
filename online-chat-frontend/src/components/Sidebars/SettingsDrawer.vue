@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import {defineProps, ref} from "vue";
+import {ref} from "vue";
 import {onMounted} from "vue";
 import Bus from "@/utils/EventBus";
 
