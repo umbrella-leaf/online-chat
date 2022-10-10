@@ -36,7 +36,7 @@
                 <path d="M560 448a48 48 0 1 0-95.968-0.032A48 48 0 0 0 560 448M240 448a48 48 0 1 0 95.968 0.032A48 48 0 0 0 240 448M784 448a48 48 0 1 0-95.968-0.032A48 48 0 0 0 784 448" fill="#181818" p-id="1653"></path>
               </svg>
 						</span>
-          <span class="label">存档</span>
+          <span class="label">用户</span>
         </router-link>
       </a-menu-item>
     </a-menu>

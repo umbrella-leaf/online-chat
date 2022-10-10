@@ -6,7 +6,7 @@ export const SidebarRoutes = [
   },
   {
     path: '/profile',
-    name: '存档',
+    name: '用户',
     component: () => import("../views/UserProfile")
   }
 ]
