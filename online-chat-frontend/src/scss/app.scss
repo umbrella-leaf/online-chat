@@ -23,9 +23,8 @@
 // / Base
 
 // Layouts
-@import "./layouts/default" ;
-@import "./layouts/dashboard" ;
-@import "./layouts/dashboard-rtl" ;
+@import "./layouts/_default" ;
+@import "./layouts/_entrance";
 // Layouts
 
 // Components
@@ -54,7 +53,5 @@
 
 // Pages
 @import "./pages/_profile" ;
-@import "./pages/_sign-in" ;
-@import "./pages/_sign-up" ;
 @import "./pages/_chatroom";
 // Pages
