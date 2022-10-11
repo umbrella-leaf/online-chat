@@ -1,12 +1,23 @@
 <template>
   <div>
     <a-card bordered class="user-profile">
-      <a-row>
+      <a-row :gutter="16">
         <a-col :span="24" :md="8">
           <UserInfoModify :UserInfo="UserInfo" />
         </a-col>
-        <a-col :span="24" :md="16">
-
+        <a-col :span="24" :md="8">
+          <a-card class="friend-manage">
+            <template #title>
+              <span>好友管理</span>
+            </template>
+          </a-card>
+        </a-col>
+        <a-col :span="24" :md="8">
+          <a-card class="intimacy-rank">
+            <template #title>
+              <span>亲密度排行</span>
+            </template>
+          </a-card>
         </a-col>
       </a-row>
     </a-card>

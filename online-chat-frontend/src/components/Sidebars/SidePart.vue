@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import Bus from '@/utils/EventBus';
 import {useRouter, onBeforeRouteUpdate} from "vue-router";
 

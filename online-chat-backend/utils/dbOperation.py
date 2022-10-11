@@ -128,9 +128,10 @@ class MySQL:
     @staticmethod
     def changeUserInfo(telephone, info_dict) -> Response:
         try:
-            avatar_base64 = info_dict["avatar_url"]
-            avatar_url = MySQL.ProcessUserAvatar(telephone, avatar_base64)
-            info_dict["avatar_url"] = avatar_url
+            if "avatar_url" in info_dict:
+                avatar_base64 = info_dict["avatar_url"]
+                avatar_url = MySQL.ProcessUserAvatar(telephone, avatar_base64)
+                info_dict["avatar_url"] = avatar_url
             User.query.filter_by(telephone=telephone).update(info_dict)
             db.session.commit()
             return Success()
