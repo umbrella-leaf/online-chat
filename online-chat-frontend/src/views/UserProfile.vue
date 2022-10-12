@@ -6,11 +6,7 @@
           <UserInfoModify :UserInfo="UserInfo" />
         </a-col>
         <a-col :span="24" :md="8">
-          <a-card class="friend-manage">
-            <template #title>
-              <span>好友管理</span>
-            </template>
-          </a-card>
+          <FriendsManage :FriendList="FriendList"/>
         </a-col>
         <a-col :span="24" :md="8">
           <a-card class="intimacy-rank">
@@ -31,9 +27,12 @@ import {computed, onUnmounted, ref} from "vue";
 import {useStore} from "vuex";
 import UserInfoModify from "@/components/Widgets/UserProfile/UserInfoModify";
 import Bus from "@/utils/EventBus"
+import FriendsManage from "@/components/Widgets/UserProfile/FriendsManage";
+import {apiGetFriendList} from "@/apis/friend/get-friend-list";
 
 const store = useStore();
 
+// 获取用户信息
 const UserInfo = computed(() => {
   return store.state.user.info;
 })
@@ -50,13 +49,34 @@ const GetUserInfo = () => {
     })
 }
 GetUserInfo();
+// 获取好友列表
+// 初始化时获取好友列表
+const FriendList = ref([]);
+const GetFriendList = () => {
+  apiGetFriendList()
+    .then(response => {
+      ResponseToMessage(response, false);
+      if (response.data.status === 200) {
+        FriendList.value = response.data.data;
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
+    })
+}
+GetFriendList();
 
 
 Bus.$on('updateUserInfo', () => {
   GetUserInfo();
 })
+Bus.$on('updateFriendList', () => {
+  GetFriendList();
+})
 onUnmounted(() => {
   Bus.$off('updateUserInfo');
+  Bus.$off('updateFriendList');
 })
 
 </script>

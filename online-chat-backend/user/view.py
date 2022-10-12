@@ -1,8 +1,8 @@
 from flask import Blueprint, request, g, jsonify
 from utils.dbOperation import MySQL
 from utils.Response import Error, Success, Warn
-from utils.Token import Token
-from exts import auth_user, auth_token
+from utils.Enums import UserState
+from exts import auth_token
 
 user_route = Blueprint('user', __name__)
 
@@ -36,7 +36,7 @@ def changeStatus():
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     # 已验证
-    if res.data == 1:
+    if res.data == UserState.authorized.value:
         return jsonify(Warn(message="该用户已经验证过！").to_dict())
     # 未验证则提交验证状态改变
     res = MySQL.ChangeStatus(telephone)

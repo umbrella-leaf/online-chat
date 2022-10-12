@@ -1,5 +1,7 @@
 from exts import db
-from datetime import datetime
+from utils.Enums import UserState
+from sqlalchemy.sql import func
+from sqlalchemy import text
 
 
 class User(db.Model):
@@ -10,10 +12,11 @@ class User(db.Model):
     telephone = db.Column(db.String(13), nullable=False, unique=True)
     email = db.Column(db.String(64), nullable=False)
     nickname = db.Column(db.String(255))
-    avatar_url = db.Column(db.String(255), nullable=False, default='http://image.umbrella-leaf.com/avatar/default.png')
-    signature = db.Column(db.String(255), nullable=False, default='一段有个性的签名')
-    status = db.Column(db.Integer, nullable=False, default=0)
-    register_time = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now().strftime("%Y-%m-%d %X"))
+    avatar_url = db.Column(db.String(255), nullable=False,
+                           server_default="http://image.umbrella-leaf.com/avatar/default.png")
+    signature = db.Column(db.String(255), nullable=False, server_default="一段有个性的签名")
+    status = db.Column(db.Integer, nullable=False, server_default=text(str(UserState.unauthorized.value)))
+    register_time = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
 
     def __repr__(self):
         return f"<User(id={self.user_id})>"

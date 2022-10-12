@@ -35,6 +35,7 @@ import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
 import UserInfoLeft from "@/components/Widgets/ChatRoom/UserInfoLeft";
 import SessionsList from "@/components/Widgets/ChatRoom/SessionsList";
 import UserInfoRight from "@/components/Widgets/ChatRoom/UserInfoRight";
+import {apiGetFriendList} from "@/apis/friend/get-friend-list";
 
 
 const store = useStore();
@@ -85,6 +86,7 @@ const sessions = ref([
 ])
 
 
+// 初始化时获取用户信息
 const UserInfo = computed(() => {
   return store.state.user.info;
 })
@@ -100,7 +102,6 @@ const GetUserInfo = () => {
       console.log(error);
       ReportErrorMessage(error);
     })
-
 }
 GetUserInfo();
 

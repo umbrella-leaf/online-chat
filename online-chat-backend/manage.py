@@ -7,6 +7,7 @@ from utils.dbOperation import MySQL
 from exts import *
 from entrance.view import entrance_route
 from user.view import user_route
+from friend.view import friend_route
 import config
 import re
 
@@ -18,6 +19,7 @@ db.init_app(app)
 db.create_all(app=app)
 # 注册蓝图
 app.register_blueprint(entrance_route, url_prefix='/')
+app.register_blueprint(friend_route, url_prefix='/friend')
 app.register_blueprint(user_route, url_prefix='/user')
 # 初始化CORS跨域模块
 CORS(app, supports_credentials=True)
@@ -55,6 +57,7 @@ def verify_token(token):
     g.res = res
     if res.status == 200:
         g.telephone = res.data['telephone']
+        g.user_id = res.data['user_id']
         return True
     return False
 

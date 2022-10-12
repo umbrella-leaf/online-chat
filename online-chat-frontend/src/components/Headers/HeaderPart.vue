@@ -64,7 +64,7 @@
           <a-button type="link" class="sidebar-toggler" @click="toggleSideBar">
             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg>
           </a-button>
-          <router-link to="/sign-in" class="btn-sign-in" @click="e => e.preventDefault()">
+          <router-link class="btn-sign-in" @click="e => e.preventDefault()" to>
             <a-dropdown :trigger="['hover', 'click']"
                         :get-popup-container="() => wrapper">
               <a-avatar shape="circle" :src="avatar_url">
@@ -93,11 +93,13 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {computed, createVNode, ref} from "vue";
 import {onMounted, onUnmounted} from "vue";
 import {useRoute, useRouter} from 'vue-router';
 import {useStore} from "vuex";
 import Bus from '@/utils/EventBus';
+import {Modal} from "ant-design-vue";
+import {ExclamationCircleOutlined} from "@ant-design/icons-vue"
 
 const route = useRoute();
 const store = useStore();
@@ -179,9 +181,19 @@ const toggleSideBar = () => {
 // 登出
 const SignOut = (e) => {
   e.preventDefault();
-  store.commit('user/deleteToken');
-  store.commit('user/deleteUserInfo');
-  router.push('/sign-in');
+  Modal.confirm({
+    title: "登出确认",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "您确定要注销登录吗？",
+    okText: "确认",
+    cancelText: "取消",
+    onOk() {
+      store.commit('user/deleteToken');
+      store.commit('user/deleteUserInfo');
+      router.push('/sign-in');
+    },
+    onCancel() {}
+  })
 }
 
 

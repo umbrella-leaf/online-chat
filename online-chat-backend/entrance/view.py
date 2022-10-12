@@ -1,6 +1,7 @@
 from flask import Blueprint, request, g, jsonify
 from utils.dbOperation import MySQL
 from utils.Response import Warn, Error, Success
+from utils.Enums import UserState
 from utils.Token import Token
 from exts import auth_user, sms, smtp
 
@@ -12,16 +13,20 @@ entrance_route = Blueprint('entrance', __name__)
 @auth_user.login_required
 def signIn():
     telephone = g.telephone
-    # 用户状态
+    # 检查用户状态
     res = MySQL.getStatus(telephone)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     status = res.data
-    if not status:
+    if status == UserState.unauthorized.value:
         return jsonify(Warn(message='登录失败，用户未进行邮箱验证！').to_dict())
-
+    # 获取用户ID
+    res = MySQL.getUserID(telephone)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    user_id = res.data
     # 生成token
-    res = Token.generate_auth_token(telephone)
+    res = Token.generate_auth_token(telephone, user_id)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     token = res.data
@@ -49,7 +54,7 @@ def signUp():
             return jsonify(Error.error.to_dict())
         status = res.data
         # 已注册且已验证，直接报错
-        if status == 1:
+        if status == UserState.authorized.value:
             return jsonify(Warn(message='该手机号已被注册！').to_dict())
         # 已注册未验证，删除原有用户记录
         else:

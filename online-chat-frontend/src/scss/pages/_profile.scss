@@ -50,7 +50,16 @@
 		}
 	}
 	.friend-manage {
-
+		.ant-input-search {
+			margin-bottom: 10px;
+		}
+		.ant-list {
+			height: 418px;
+			overflow-y: scroll;
+			.friend-nickname {
+				font-size: 16px;
+			}
+		}
 	}
 	.intimacy-rank {
 

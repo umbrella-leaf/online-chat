@@ -42,7 +42,7 @@
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import {useStore} from 'vuex';
-import {useState} from "@/utils/hooks/useState";
+import {index} from "@/utils/hooks";
 import Bus from '@/utils/EventBus';
 import SidePart from '../components/Sidebars/SidePart';
 import HeaderPart from '../components/Headers/HeaderPart';
@@ -81,7 +81,7 @@ const store = useStore();
 // // Settings drawer visibility status.
 // const showSettingsDrawer = computed(() => store.state.settings.showSettingsDrawer);
 const {sidebarCollapsed, sidebarColor, sidebarTheme, navbarFixed, showSettingsDrawer}
-  = useState("settings",
+  = index("settings",
   ["sidebarCollapsed",
     "sidebarColor",
     "sidebarTheme",

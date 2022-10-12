@@ -10,9 +10,11 @@ SECRET_KEY = 'Backend for online chat web system'
 class Token:
     # 生成token，有效期60min
     @staticmethod
-    def generate_auth_token(telephone, expiration=3600) -> Response:
+    def generate_auth_token(telephone, user_id, expiration=3600) -> Response:
         s = Serializer(SECRET_KEY, expires_in=expiration)
-        return Success(data=s.dumps({'telephone': telephone, 'time': int(time.time())}).decode())
+        return Success(data=s.dumps({'telephone': telephone,
+                                     'user_id': user_id,
+                                     'time': int(time.time())}).decode())
 
     # 解析token
     @staticmethod
