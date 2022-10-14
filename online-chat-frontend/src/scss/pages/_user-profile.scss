@@ -1,4 +1,4 @@
-// _profile.scss
+// _user-profile.scss
 //
 // Template's profile page styles.
 //
@@ -8,6 +8,7 @@
 .user-profile {
 	background-color: #FFE4C4;
 	height: 650px;
+	overflow-x: auto;
 	border-radius: 8px !important;
 	.ant-card-head-title {
 		span {

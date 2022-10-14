@@ -6,10 +6,10 @@
 
 // Dashboard Layout
 .layout-dashboard {
-  background: transparent;
   text-align: left;
   position: relative;
   overflow-x: hidden;
+  background: rgb(240, 240, 240);
 
   @media( min-width: $lg ){
     overflow: auto;
@@ -33,7 +33,7 @@
     overflow: auto;
     margin: 0;
     padding: 33px 20px;
-    background: #ffffff !important;
+    background: rgb(240, 240, 240) !important;
 
     @media( min-width: $lg ){
       margin: 20px 0 0 20px;
