@@ -5,7 +5,9 @@ from user.model import User
 from friend.model import FriendShip
 from utils.Response import Response, Success, Error
 from utils.Enums import UserState, FriendState
+from sqlalchemy import or_, and_
 from time import time
+from datetime import datetime
 import pymysql
 
 
@@ -51,7 +53,7 @@ class MySQL:
 
     # 从数据库删除用户
     @staticmethod
-    def delUser(telephone) -> Response:
+    def deleteUser(telephone) -> Response:
         try:
             User.query.filter_by(telephone=telephone).delete()
             db.session.commit()
@@ -83,6 +85,16 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
+    # 查询该ID用户是否存在
+    @staticmethod
+    def checkUserByID(user_id) -> Response:
+        try:
+            user = User.query.filter_by(user_id=user_id).first()
+            return Success(data=user is not None)
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
+
     # 查询用户状态（是否已经验证）
     @staticmethod
     def getStatus(telephone) -> Response:
@@ -105,7 +117,7 @@ class MySQL:
             'avatar_url': user.avatar_url
         }
 
-    # 获取用户信息
+    # 获取当前用户信息
     @staticmethod
     def getUserInfo(telephone) -> Response:
         try:
@@ -185,9 +197,28 @@ class MySQL:
                                     'pos_id': usership.user_id,
                                     'neg_id': usership.friend_id})
             # 按id排序
-            friend_list = sorted(friend_list, key=lambda x: x['id'])
+            friend_list = sorted(friend_list, key=lambda x: x['start'], reverse=True)
             # 合起来得到完整的好友列表
             return Success(data=friend_list)
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
+
+    # 获取全部好友的ID（包括四个状态的好友关系，只要有好友关系就获取）
+    @staticmethod
+    def getAllFriendID(user_id) -> Response:
+        try:
+            user = User.query.filter_by(user_id=user_id).first()
+            # 获取主动添加好友列表
+            friendships = user.friendships
+            # 获取被动接受好友列表
+            userships = user.userships
+            friend_id_list = []
+            for friendship in friendships:
+                friend_id_list.append(friendship.friend.user_id)
+            for usership in userships:
+                friend_id_list.append(usership.user.user_id)
+            return Success(data=friend_id_list)
         except pymysql.err as e:
             MySQL.errOut(e)
             return Error()
@@ -216,7 +247,10 @@ class MySQL:
     @staticmethod
     def changeFriendStatus(friendship_id, status) -> Response:
         try:
-            FriendShip.query.filter_by(id=friendship_id).update({"status": status.value})
+            update_dict = {"status": status.value}
+            if status == FriendState.normal:
+                update_dict.setdefault("start_time", datetime.now().strftime("%Y-%m-%d %X"))
+            FriendShip.query.filter_by(id=friendship_id).update(update_dict)
             db.session.commit()
             return Success()
         except pymysql.err as e:
@@ -236,9 +270,68 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
+    # 添加好友关系
+    @staticmethod
+    def addFriendShip(pos_id, neg_id) -> Response:
+        try:
+            friendship = FriendShip(user_id=pos_id, friend_id=neg_id)
+            db.session.add(friendship)
+            db.session.commit()
+            return Success()
+        except pymysql.err as e:
+            db.session.rollback()
+            MySQL.errOut(e)
+            return Error()
 
+    # 根据用户ID user_id搜索全体用户，user_id为当前用户ID（此参数是为了过滤当前用户好友）
+    @staticmethod
+    def searchAllUsersByID(user_id, target_id) -> Response:
+        try:
+            res = MySQL.getAllFriendID(user_id)
+            if res.status != 200:
+                return Error()
+            # 好友ID列表中包括自己，把自己也过滤
+            friend_id_list = [*res.data, user_id]
+            if target_id in friend_id_list:
+                return Success(data=[])
+            # 因为一个user_id只对应一个用户，故此处用first()
+            target_user = User.query.filter_by(user_id=target_id, status=UserState.authorized.value).first()
+            # 找不到该用户，返回空列表
+            if target_user is None:
+                return Success(data=[])
+            return Success(data=[MySQL.filterUserInfo(target_user)])
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
 
+    # 根据关键字name搜索全体用户（用户名或昵称匹配），同样需要获取当前用户ID来过滤
+    @staticmethod
+    def searchAllUsersByName(user_id, name) -> Response:
+        try:
+            res = MySQL.getAllFriendID(user_id)
+            if res.status != 200:
+                return Error()
+            # 好友ID列表中包括自己，把自己也过滤
+            friend_id_list = [*res.data, user_id]
+            # 搜索用户名或昵称匹配关键字（且已验证）的用户
+            UserNameMatch = User.user_name.ilike('%{keyword}%'.format(keyword=name))
+            NickNameNone = or_(User.nickname.is_(None), User.nickname == '')
+            NickNameMatch = User.nickname.ilike('%{keyword}%'.format(keyword=name))
+            target_users = User.query.filter(and_(
+                or_(and_(NickNameNone, UserNameMatch), NickNameMatch),
+                User.status == UserState.authorized.value)).all()
+            target_users = [MySQL.filterUserInfo(target_user) for target_user in target_users
+                            if target_user.user_id not in friend_id_list]
+            return Success(data=target_users)
+        except pymysql.err as e:
+            MySQL.errOut(e)
+            return Error()
 
-
-
-
+    # 判断用户ID关键字是否是正整数（工具函数）
+    @staticmethod
+    def userIDKeywordIsInteger(keyword):
+        try:
+            n = float(keyword)
+            return n.is_integer() and str(keyword).count('.') == 0 and int(n) > 0
+        except Exception as e:
+            return False

@@ -25,7 +25,7 @@ def signIn():
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     user_id = res.data
-    # 生成token
+    # 结合手机号和用户ID生成token
     res = Token.generate_auth_token(telephone, user_id)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
@@ -38,10 +38,18 @@ def signIn():
 @entrance_route.route('/sign-up', methods=['POST'])
 def signUp():
     # 获取数据
-    username = request.json['username']
-    password = request.json['password']
-    email = request.json['email']
-    telephone = request.json['telephone']
+    username = request.json.get("username")
+    if username is None:
+        return jsonify(Error(message="用户名不能为空！").to_dict())
+    password = request.json.get("password")
+    if password is None:
+        return jsonify(Error(message="密码不能为空！").to_dict())
+    email = request.json.get("email")
+    if email is None:
+        return jsonify(Error(message="邮箱不能为空！").to_dict())
+    telephone = request.json.get("telephone")
+    if telephone is None:
+        return jsonify(Error(message="手机号不能为空！").to_dict())
 
     # 检查手机号是否已被注册
     res = MySQL.checkTel(telephone)
@@ -58,7 +66,7 @@ def signUp():
             return jsonify(Warn(message='该手机号已被注册！').to_dict())
         # 已注册未验证，删除原有用户记录
         else:
-            res = MySQL.delUser(telephone)
+            res = MySQL.deleteUser(telephone)
             if res.status != 200:
                 return jsonify(Error.error.to_dict())
     res = MySQL.addUser(username, email, password, telephone)
@@ -69,8 +77,12 @@ def signUp():
 
 @entrance_route.route('/send-code', methods=['POST'])
 def sendVerifyCode():
-    verifyCode = request.json['verifyCode']
-    telephone = request.json['telephone']
+    verifyCode = request.json.get("verifyCode")
+    if verifyCode is None:
+        return jsonify(Error(message="验证码不能为空！").to_dict())
+    telephone = request.json.get("telephone")
+    if telephone is None:
+        return jsonify(Error(message="手机号不能为空！").to_dict())
     # 发送验证码
     res = sms.SendVerifyCode(verifyCode, telephone)
     if res.status != 200:
@@ -84,8 +96,12 @@ def sendVerifyCode():
 
 @entrance_route.route('/send-email', methods=['POST'])
 def sendVerifyEmail():
-    email = request.json['email']
-    telephone = request.json['telephone']
+    email = request.json.get("email")
+    if email is None:
+        return jsonify(Error(message="邮箱不能为空！").to_dict())
+    telephone = request.json.get("telephone")
+    if telephone is None:
+        return jsonify(Error(message="手机号不能为空！").to_dict())
     # 发送验证邮件
     res = smtp.SendVerifyEmail(email, telephone)
     if res.status != 200:

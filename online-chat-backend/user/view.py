@@ -51,9 +51,41 @@ def changeStatus():
 def ChangeUserInfo():
     telephone = g.telephone
     info_dict = request.json
+    expect_keys = ['nickname', 'signature', 'avatar_url']
+    if not (set(info_dict.keys()) <= set(expect_keys)):
+        return jsonify(Error(message="参数格式错误！").to_dict())
     res = MySQL.changeUserInfo(telephone, info_dict)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="信息修改成功！").to_dict())
+
+
+# 获取全部用户信息
+@user_route.route('/search-user', methods=['POST'])
+@auth_token.login_required
+def SearchUser():
+    user_id = g.user_id
+    search_by = request.json.get("search_by")
+    search_methods = ['id', 'name']
+    if search_by not in search_methods:
+        return jsonify(Error(message="搜索方式不正确！").to_dict())
+    keyword = request.json.get('keyword')
+    if keyword is None:
+        return jsonify(Error(message="关键字不能为空！").to_dict())
+    # 根据用户ID搜索
+    if search_by == 'id':
+        # 确保ID关键字是正整数
+        if not MySQL.userIDKeywordIsInteger(keyword):
+            return jsonify(Warn(message="ID关键字必须为正整数！").to_dict())
+        res = MySQL.searchAllUsersByID(user_id, int(keyword))
+    # 根据用户名称搜索
+    else:
+        res = MySQL.searchAllUsersByName(user_id, keyword)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    user_list = res.data
+    return jsonify(Success(data=user_list, message="搜索用户成功！").to_dict())
+
+
 
 
