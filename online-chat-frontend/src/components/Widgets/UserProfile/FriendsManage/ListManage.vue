@@ -20,22 +20,16 @@
           <template #actions>
             <div>
               <a-popconfirm :title='`确定要屏蔽"${DisplayName(item)}"吗？`'
-                            ok-text="确定"
-                            cancel-text="取消"
                             v-if="NoBlack(item)"
                             @confirm="BlackFriend(item)">
                 <a-button type="link">屏蔽</a-button>
               </a-popconfirm>
               <a-popconfirm :title='`确定要解除对"${DisplayName(item)}"的屏蔽吗？`'
-                            ok-text="确定"
-                            cancel-text="取消"
                             v-if="PositiveBlack(item)"
                             @confirm="WhiteFriend(item)">
                 <a-button type="link">解除</a-button>
               </a-popconfirm>
               <a-popconfirm :title='`确定要删除"${DisplayName(item)}"的好友吗？`'
-                            ok-text="确定"
-                            cancel-text="取消"
                             @confirm="DeleteFriend(item)">
                 <a-button type="link" danger>删除</a-button>
               </a-popconfirm>
@@ -51,7 +45,7 @@
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import {apiBlackFriend} from "@/apis/friend/black-friend";
-import {ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import Bus from "@/utils/EventBus";
 import {apiWhiteFriend} from "@/apis/friend/white-friend";
 import {apiDeleteFriend} from "@/apis/friend/delete-friend";
@@ -107,6 +101,10 @@ const BlackFriend = (item) => {
         Bus.$emit('updateFriendList');
       }
     })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
+    })
 }
 // 解除屏蔽
 const WhiteFriend = (item) => {
@@ -117,6 +115,10 @@ const WhiteFriend = (item) => {
         Bus.$emit('updateFriendList');
       }
     })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
+    })
 }
 // 删除好友
 const DeleteFriend = (item) => {
@@ -126,6 +128,10 @@ const DeleteFriend = (item) => {
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
       }
+    })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
     })
 }
 

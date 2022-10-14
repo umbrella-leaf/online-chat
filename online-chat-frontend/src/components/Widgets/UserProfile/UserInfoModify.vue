@@ -172,10 +172,10 @@ const beforeUpload  = (file) => {
 
 // 信息发生改变时才允许提交
 const NickNameChanged = computed(() => {
-  return FormState.value.nickname !== UserInfo.value.nickname;
+  return FormState.value.nickname?.toString().trim() !== UserInfo.value.nickname;
 })
 const SignatureChanged = computed(() => {
-  return FormState.value.signature !== UserInfo.value.signature;
+  return FormState.value.signature?.toString().trim() !== UserInfo.value.signature;
 })
 const AvatarUrlChanged = computed(() => {
   return FormState.value.avatar_url !== UserInfo.value.avatar_url;
@@ -187,13 +187,13 @@ const InfoChanged = computed(() => {
 const getChangedFormFields = () => {
   const params = {};
   if (NickNameChanged.value) {
-    params.nickname = FormState.value.nickname;
+    params.nickname = FormState.value.nickname?.toString().trim();
   }
   if (SignatureChanged.value) {
-    params.signature = FormState.value.signature;
+    params.signature = FormState.value.signature?.toString().trim();
   }
   if (AvatarUrlChanged.value) {
-    params.avatar_url = FormState.value.avatar_url;
+    params.avatar_url = FormState.value?.avatar_url;
   }
   return params;
 }

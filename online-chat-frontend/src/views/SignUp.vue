@@ -233,7 +233,7 @@ const sendVerifyCode = () => {
             }, 1000);
           }
         })
-        .catch(() => {
+        .catch((error) => {
           ReportErrorMessage(error);
         })
     }

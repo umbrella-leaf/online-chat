@@ -92,7 +92,7 @@ const SignIn = (value) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         store.commit('user/updateToken', response.data.data['token']);
-        router.push('/chatroom');
+        router.push('/chat-room');
       }
     })
     .catch(error => {

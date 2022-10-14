@@ -41,7 +41,9 @@ const GetUserInfo = () => {
     .then(response => {
       ResponseToMessage(response, false);
       if (response.data.status === 200) {
-        store.commit('user/updateUserInfo', response.data.data);
+        const info = response.data.data;
+        info.nickname = info.nickname ? info.nickname : '';
+        store.commit('user/updateUserInfo', info);
       }
     })
     .catch(error => {
