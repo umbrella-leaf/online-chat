@@ -9,51 +9,8 @@
             </template>
             <a-row>
               <a-col :span="24" :md="{offset: 1, span: 22}">
-                <a-input-search
-                  v-model:value="FormState.keyword"
-                  @search="SearchUsers"
-                  @keyup="onKeyup"
-                  size="large"
-                  enter-button placeholder="输入关键字来搜索用户">
-                  <template #addonBefore>
-                    <a-select v-model:value="FormState.search_by">
-                      <a-select-option value="id">按ID搜索</a-select-option>
-                      <a-select-option value="name">按名称搜索</a-select-option>
-                    </a-select>
-                  </template>
-                </a-input-search>
-                <a-empty v-if="SearchResults.length === 0" class="search-empty">
-                  <template #description>
-                    <span>未搜索到用户</span>
-                  </template>
-                </a-empty>
-                <a-list item-layout="horizontal"
-                        :data-source="SearchResults"
-                        class="search-result"
-                        split v-else>
-                  <template #renderItem="{ item }">
-                    <a-list-item>
-                      <a-list-item-meta>
-                        <template #title>
-                          <span>{{ DisplayName(item) }}</span>
-                        </template>
-                        <template #avatar>
-                          <a-avatar shape="circle" :src="item.avatar_url" />
-                        </template>
-                        <template #description>
-                          <span>{{ item.signature }}</span>
-                        </template>
-                      </a-list-item-meta>
-                      <template #actions>
-                        <a-popconfirm
-                          :title='`确定要向用户"${DisplayName(item)}"发出好友申请吗？`'
-                          @confirm="SendFriendApply(item)">
-                          <a-button type="link">发出好友申请</a-button>
-                        </a-popconfirm>
-                      </template>
-                    </a-list-item>
-                  </template>
-                </a-list>
+                <SearchInput />
+                <ResultShow :loading="loading" :SearchResults="SearchResults" :total="total" :SearchState="SearchState"/>
               </a-col>
             </a-row>
           </a-card>
@@ -66,47 +23,65 @@
 <script setup>
 
 // 关键字
-import {computed, ref} from "vue";
+import {computed, nextTick, onUnmounted, ref} from "vue";
 import {apiSearchUser} from "@/apis/user/search-user";
 import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import {apiAddFriend} from "@/apis/friend/add-friend";
 import {useStore} from "vuex";
+import Bus from "@/utils/EventBus";
+import SearchInput from "@/components/Widgets/UserSearch/SearchInput";
+import ResultShow from "@/components/Widgets/UserSearch/ResultShow";
 
 
 const store = useStore();
-const FormState = ref({
+// 搜索状态，包括页码、页大小、查询方式和关键字
+const SearchState = ref({
   search_by: 'id',
-  keyword: ''
+  keyword: '',
+  currentPage: 1,
+  pageSize: 5
 })
 
+
+// 加载中标识
+const loading = ref(false);
 // 搜索结果用户列表
 const SearchResults = ref([]);
-const SearchUsers = () => {
-  apiSearchUser(FormState.value)
+const total = ref(0);
+const SearchUsers = (search_source) => {
+  loading.value = true;
+  apiSearchUser(SearchState.value)
     .then(response => {
       ResponseToMessage(response, false);
+      loading.value = false;
       if (response.data.status === 200) {
-        SearchResults.value = response.data.data;
+        SearchResults.value = response.data.data.user_list;
+        total.value = response.data.data.total;
+        // 若是按钮引起的获取列表，就将页码设置为1
+        if (search_source.btn) {
+          SearchState.value.currentPage = 1;
+        }
+        // 若不是添加好友引起的获取列表，就将滚动条移动到最上
+        if (!search_source.add) {
+          nextTick(() => {
+            Bus.$emit('resultDisplayToTop');
+          })
+        }
+      } else {
+        SearchResults.value = [];
+        total.value = 0;
       }
     })
     .catch(error => {
       console.log(error);
       ReportErrorMessage(error);
+      loading.value = false;
     })
 }
+
+
 // 获取当前用户ID
 const cur_id = computed(() => store.state.user.info.id);
-// 用户名称显示文本
-const DisplayName = (item) => {
-  return item.nickname || item.username;
-}
-// 按回车搜索
-const onKeyup = (e) => {
-  if (e.keyCode === 13) {
-    SearchUsers();
-  }
-}
-
 // 发出好友申请
 const SendFriendApply = (item) => {
   const param = {
@@ -117,11 +92,7 @@ const SendFriendApply = (item) => {
     .then(response => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
-        // 重置搜索结果
-        FormState.value.keyword = '';
-        SearchResults.value = SearchResults.value.filter((user) => {
-          return user.id !== item.id;
-        });
+        SearchUsers({btn: false, add: true});
       }
     })
     .catch(error => {
@@ -129,6 +100,38 @@ const SendFriendApply = (item) => {
       ReportErrorMessage(error);
     })
 }
+
+
+// 给Bus挂载事件
+Bus.$on('searchUsers', (params) => {
+  SearchUsers(params);
+})
+Bus.$on('sendApply', (item) => {
+  SendFriendApply(item);
+})
+Bus.$on('updateSearchBy', (search_by) => {
+  SearchState.value.search_by  = search_by;
+})
+Bus.$on('updateKeyword', (keyword) => {
+  SearchState.value.keyword  = keyword;
+})
+Bus.$on('updateCurrentPage', (currentPage) => {
+  SearchState.value.currentPage  = currentPage;
+})
+Bus.$on('updatePageSize', (pageSize) => {
+  SearchState.value.pageSize  = pageSize;
+})
+
+// 销毁时卸载
+onUnmounted(() => {
+  Bus.$off('searchUsers');
+  Bus.$off('sendApply');
+  Bus.$off('updateSearchBy');
+  Bus.$off('updateKeyword');
+  Bus.$off('updateCurrentPage');
+  Bus.$off('updatePageSize');
+})
+
 
 </script>
 

@@ -1,43 +1,45 @@
 <template>
   <div>
     <a-input-search enter-button placeholder="输入关键字来搜索" v-model:value="keyword">输入关键字来搜索</a-input-search>
-    <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ListFriends">
-      <template #renderItem="{ item }">
-        <a-list-item>
-          <a-list-item-meta>
-            <template #avatar>
-              <a-avatar shape="circle" :src="item.avatar_url" />
+    <a-spin :spinning="loading" tip="加载中……">
+      <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ListFriends">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a-list-item-meta>
+              <template #avatar>
+                <a-avatar shape="circle" :src="item.avatar_url" />
+              </template>
+              <template #title>
+                <span class="friend-nickname">{{ DisplayName(item) }}</span>
+              </template>
+              <template #description>
+                <span v-if="PositiveBlack(item)">已屏蔽</span>
+                <span v-else-if="NegativeBlack(item)">已被屏蔽</span>
+                <span v-else>正常</span>
+              </template>
+            </a-list-item-meta>
+            <template #actions>
+              <div>
+                <a-popconfirm :title='`确定要屏蔽"${DisplayName(item)}"吗？`'
+                              v-if="NoBlack(item)"
+                              @confirm="BlackFriend(item)">
+                  <a-button type="link">屏蔽</a-button>
+                </a-popconfirm>
+                <a-popconfirm :title='`确定要解除对"${DisplayName(item)}"的屏蔽吗？`'
+                              v-if="PositiveBlack(item)"
+                              @confirm="WhiteFriend(item)">
+                  <a-button type="link">解除</a-button>
+                </a-popconfirm>
+                <a-popconfirm :title='`确定要删除"${DisplayName(item)}"的好友吗？`'
+                              @confirm="DeleteFriend(item)">
+                  <a-button type="link" danger>删除</a-button>
+                </a-popconfirm>
+              </div>
             </template>
-            <template #title>
-              <span class="friend-nickname">{{ DisplayName(item) }}</span>
-            </template>
-            <template #description>
-              <span v-if="PositiveBlack(item)">已屏蔽</span>
-              <span v-else-if="NegativeBlack(item)">已被屏蔽</span>
-              <span v-else>正常</span>
-            </template>
-          </a-list-item-meta>
-          <template #actions>
-            <div>
-              <a-popconfirm :title='`确定要屏蔽"${DisplayName(item)}"吗？`'
-                            v-if="NoBlack(item)"
-                            @confirm="BlackFriend(item)">
-                <a-button type="link">屏蔽</a-button>
-              </a-popconfirm>
-              <a-popconfirm :title='`确定要解除对"${DisplayName(item)}"的屏蔽吗？`'
-                            v-if="PositiveBlack(item)"
-                            @confirm="WhiteFriend(item)">
-                <a-button type="link">解除</a-button>
-              </a-popconfirm>
-              <a-popconfirm :title='`确定要删除"${DisplayName(item)}"的好友吗？`'
-                            @confirm="DeleteFriend(item)">
-                <a-button type="link" danger>删除</a-button>
-              </a-popconfirm>
-            </div>
-          </template>
-        </a-list-item>
-      </template>
-    </a-list>
+          </a-list-item>
+        </template>
+      </a-list>
+    </a-spin>
   </div>
 </template>
 
@@ -56,6 +58,10 @@ const props = defineProps({
   ListFriends: {
     type: Array,
     default: []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 })
 // 获取当前用户ID

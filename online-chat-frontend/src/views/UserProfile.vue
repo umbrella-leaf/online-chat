@@ -6,7 +6,7 @@
           <UserInfoModify :UserInfo="UserInfo" />
         </a-col>
         <a-col :span="24" :md="8">
-          <FriendsManage :FriendList="FriendList"/>
+          <FriendsManage :FriendList="FriendList" :loading="loading"/>
         </a-col>
         <a-col :span="24" :md="8">
           <a-card class="intimacy-rank">
@@ -51,20 +51,26 @@ const GetUserInfo = () => {
     })
 }
 GetUserInfo();
+
+
+// 好友管理刷新标识
+const loading = ref(false);
 // 获取好友列表
-// 初始化时获取好友列表
 const FriendList = ref([]);
 const GetFriendList = () => {
+  loading.value = true;
   apiGetFriendList()
     .then(response => {
       ResponseToMessage(response, false);
       if (response.data.status === 200) {
         FriendList.value = response.data.data;
       }
+      loading.value = false;
     })
     .catch(error => {
       console.log(error);
       ReportErrorMessage(error);
+      loading.value = false;
     })
 }
 GetFriendList();

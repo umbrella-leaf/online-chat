@@ -1,40 +1,42 @@
 <template>
   <div>
     <a-input-search enter-button placeholder="输入关键字来搜索" v-model:value="keyword"></a-input-search>
-    <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ApplyFriends">
-      <template #renderItem="{ item }">
-        <a-list-item>
-          <a-list-item-meta>
-            <template #avatar>
-              <a-avatar shape="circle" :src="item.avatar_url" />
-            </template>
-            <template #title>
-              <span class="friend-nickname">{{ DisplayName(item) }}</span>
-            </template>
-            <template #description>
-              <span>{{ dayjs(`${item.start}+8`).fromNow() + (PositiveApply(item) ? '发出' : '接收') }}</span>
-            </template>
-          </a-list-item-meta>
-          <template #actions>
-            <a-popconfirm :title='`确定要撤销对"${DisplayName(item)}"的好友申请吗？`'
-                          v-if="PositiveApply(item)"
-                          @confirm="CancelFriendApply(item)">
-              <a-button type="link" danger>撤销</a-button>
-            </a-popconfirm>
-            <div v-else>
-              <a-popconfirm :title='`确定要同意"${DisplayName(item)}"的好友申请吗？`'
-                            @confirm="AcceptFriendApply(item)">
-                <a-button type="link">同意</a-button>
+    <a-spin :spinning="loading" tip="加载中……">
+      <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ApplyFriends">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a-list-item-meta>
+              <template #avatar>
+                <a-avatar shape="circle" :src="item.avatar_url" />
+              </template>
+              <template #title>
+                <span class="friend-nickname">{{ DisplayName(item) }}</span>
+              </template>
+              <template #description>
+                <span>{{ dayjs(`${item.start}+8`).fromNow() + (PositiveApply(item) ? '发出' : '接收') }}</span>
+              </template>
+            </a-list-item-meta>
+            <template #actions>
+              <a-popconfirm :title='`确定要撤销对"${DisplayName(item)}"的好友申请吗？`'
+                            v-if="PositiveApply(item)"
+                            @confirm="CancelFriendApply(item)">
+                <a-button type="link" danger>撤销</a-button>
               </a-popconfirm>
-              <a-popconfirm :title='`确定要拒绝"${DisplayName(item)}"的好友申请吗？`'
-                            @confirm="RefuseFriendApply(item)">
-                <a-button type="link" danger>拒绝</a-button>
-              </a-popconfirm>
-            </div>
-          </template>
-        </a-list-item>
-      </template>
-    </a-list>
+              <div v-else>
+                <a-popconfirm :title='`确定要同意"${DisplayName(item)}"的好友申请吗？`'
+                              @confirm="AcceptFriendApply(item)">
+                  <a-button type="link">同意</a-button>
+                </a-popconfirm>
+                <a-popconfirm :title='`确定要拒绝"${DisplayName(item)}"的好友申请吗？`'
+                              @confirm="RefuseFriendApply(item)">
+                  <a-button type="link" danger>拒绝</a-button>
+                </a-popconfirm>
+              </div>
+            </template>
+          </a-list-item>
+        </template>
+      </a-list>
+    </a-spin>
   </div>
 </template>
 
@@ -54,8 +56,13 @@ const props = defineProps({
   ApplyFriends: {
     type: Array,
     default: []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 })
+
 // 获取当前用户ID
 const cur_id = computed(() => store.state.user.info.id);
 // 用户名称显示文本
