@@ -80,7 +80,13 @@ def SearchUser():
         res = MySQL.searchAllUsersByID(user_id, int(keyword))
     # 根据用户名称搜索
     else:
-        res = MySQL.searchAllUsersByName(user_id, keyword)
+        curPage = request.json.get('currentPage')
+        if curPage is None:
+            return jsonify(Error(message="页码不能为空！"))
+        pageSize = request.json.get('pageSize')
+        if pageSize is None:
+            return jsonify(Error(message="页大小不能为空！"))
+        res = MySQL.searchAllUsersByName(user_id, keyword, curPage, pageSize)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     user_list = res.data

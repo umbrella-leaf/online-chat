@@ -5,7 +5,7 @@ from user.model import User
 from friend.model import FriendShip
 from utils.Response import Response, Success, Error
 from utils.Enums import UserState, FriendState
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, not_
 from time import time
 from datetime import datetime
 import pymysql
@@ -293,36 +293,41 @@ class MySQL:
             # 好友ID列表中包括自己，把自己也过滤
             friend_id_list = [*res.data, user_id]
             if target_id in friend_id_list:
-                return Success(data=[])
+                return Success(data={'user_list': [], 'total': 0})
             # 因为一个user_id只对应一个用户，故此处用first()
             target_user = User.query.filter_by(user_id=target_id, status=UserState.authorized.value).first()
             # 找不到该用户，返回空列表
             if target_user is None:
-                return Success(data=[])
-            return Success(data=[MySQL.filterUserInfo(target_user)])
+                return Success(data={'user_list': [], 'total': 0})
+            return Success(data={'user_list': [MySQL.filterUserInfo(target_user)], 'total': 1})
         except pymysql.err as e:
             MySQL.errOut(e)
             return Error()
 
-    # 根据关键字name搜索全体用户（用户名或昵称匹配），同样需要获取当前用户ID来过滤
+    # 根据关键字name搜索全体用户（用户名或昵称匹配），同样需要获取当前用户ID来过滤，此处根据前端传来的分页情况进行分页
     @staticmethod
-    def searchAllUsersByName(user_id, name) -> Response:
+    def searchAllUsersByName(user_id, name, curPage, pageSize) -> Response:
         try:
             res = MySQL.getAllFriendID(user_id)
             if res.status != 200:
                 return Error()
             # 好友ID列表中包括自己，把自己也过滤
             friend_id_list = [*res.data, user_id]
-            # 搜索用户名或昵称匹配关键字（且已验证）的用户
+            # 搜索用户名或昵称匹配关键字的用户
             UserNameMatch = User.user_name.ilike('%{keyword}%'.format(keyword=name))
             NickNameNone = or_(User.nickname.is_(None), User.nickname == '')
             NickNameMatch = User.nickname.ilike('%{keyword}%'.format(keyword=name))
-            target_users = User.query.filter(and_(
-                or_(and_(NickNameNone, UserNameMatch), NickNameMatch),
-                User.status == UserState.authorized.value)).all()
-            target_users = [MySQL.filterUserInfo(target_user) for target_user in target_users
-                            if target_user.user_id not in friend_id_list]
-            return Success(data=target_users)
+            # 搜索非用户好友且已验证的好友
+            NotUserFriend = not_(User.user_id.in_(friend_id_list))
+            IsAuthorized = User.status == UserState.authorized.value
+            # 目标用户昵称空则匹配用户名，否则匹配昵称，并且不是当前用户并已通过验证，根据页码curPage与页大小pageSize分页查询
+            users_query = User.query.filter(and_(or_(and_(NickNameNone, UserNameMatch), NickNameMatch), NotUserFriend, IsAuthorized))
+            # 获取总数
+            total = users_query.count()
+            # 分页查询
+            target_users = users_query.limit(pageSize).offset((curPage - 1) * pageSize)
+            target_users = [MySQL.filterUserInfo(target_user) for target_user in target_users]
+            return Success(data={'user_list': target_users, 'total': total})
         except pymysql.err as e:
             MySQL.errOut(e)
             return Error()
