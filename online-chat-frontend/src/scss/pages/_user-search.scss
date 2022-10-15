@@ -22,8 +22,9 @@
   .search-result {
     margin-top: 20px;
     background: #ffffff;
-    height: 454px;
+    height: 400px;
     overflow-y: scroll;
+    margin-bottom: 22px;
     .ant-list-items {
       .ant-list-item:hover {
         position: relative;
