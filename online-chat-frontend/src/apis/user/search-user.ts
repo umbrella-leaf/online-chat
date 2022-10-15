@@ -2,7 +2,9 @@ import httpRequest from '@/apis/index'
 
 interface SearchUserParam {
     search_by: string,
-    keyword: string
+    keyword: string,
+    currentPage: number,
+    pageSize: number
 }
 
 
