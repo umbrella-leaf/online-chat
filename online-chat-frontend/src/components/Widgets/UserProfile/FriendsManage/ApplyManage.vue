@@ -16,7 +16,7 @@
                 <span>{{ dayjs(`${item.start}+8`).fromNow() + (PositiveApply(item) ? '发出' : '接收') }}</span>
               </template>
             </a-list-item-meta>
-            <template #actions>
+            <template #extra>
               <a-popconfirm :title='`确定要撤销对"${DisplayName(item)}"的好友申请吗？`'
                             v-if="PositiveApply(item)"
                             @confirm="CancelFriendApply(item)">
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import dayjs from "@/utils/time"
+import dayjs from "dayjs";
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import {apiAcceptFriendApply} from "@/apis/friend/accept-friend-apply";

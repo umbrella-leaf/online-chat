@@ -2,12 +2,12 @@
   <div class="message">
     <div class="message-wrapper" ref="msg_list">
       <ul>
-        <li v-for="(item, i) in messages" class="message-item" :key="item.time">
-          <div class="time"><span>{{item.time}}</span></div>
-          <div class="main" :class="{self: item.self}">
-            <a-avatar class="avatar" :src="item.img"  alt=""/>
+        <li v-for="(item, i) in MessageList" class="message-item">
+          <div class="time"><span>{{ TimeDisplay(item) }}</span></div>
+          <div class="main" :class="{self: IsSelfSend(item)}">
+            <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
             <div class="content">
-              <div class="text">{{item.content}}</div>
+              <div class="text">{{ item.content }}</div>
             </div>
           </div>
         </li>
@@ -17,50 +17,44 @@
 </template>
 
 <script setup>
-import {onMounted, onUnmounted, ref} from "vue";
+import {computed, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
+import {useStore} from "vuex";
+import dayjs from "dayjs";
+import {msgTimeFormat} from "@/utils/time/msgTimeFormat";
 
+
+const store = useStore();
+const props = defineProps({
+  MessageList: {
+    type: Array,
+    default: []
+  }
+})
+
+
+// 获取当前用户ID
+const cur_id = computed(() => store.state.user.info.id);
+// 判断消息是否是自己发的
+const IsSelfSend = (item) => {
+  return item.sender_id === cur_id.value;
+}
+// 时间显示格式
+const TimeDisplay = (item) => {
+  return msgTimeFormat(item.time);
+}
+// 按照时间过滤消息
+const FilterMessageList = computed(() => {
+
+})
 
 const msg_list = ref();
 const msg_list_to_bottom = () => {
   msg_list.value.scrollTop = msg_list.value.scrollHeight;
 }
-Bus.$on('SendMessage', msg_list_to_bottom);
-
-
-const messages = ref([
-  {
-    time: '2022/10/05 18:21',
-    self: true,
-    img: 'https://joeschmoe.io/api/v1/random',
-    content: '你好！'
-  },
-  {
-    time: '2022/10/05 18:22',
-    self: false,
-    img: 'https://joeschmoe.io/api/v1/random',
-    content: '嗯，你好！111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'
-  },
-  {
-    time: '2022/10/05 18:23',
-    self: true,
-    img: 'https://joeschmoe.io/api/v1/random',
-    content: '你好！'
-  },
-  {
-    time: '2022/10/05 18:24',
-    self: false,
-    img: 'https://joeschmoe.io/api/v1/random',
-    content: '嗯，你好！'
-  }
-])
-
-
-onMounted(() => {
-  msg_list_to_bottom();
-})
+Bus.$on('MessageToBottom', msg_list_to_bottom);
 onUnmounted(() => {
-  Bus.$off('SendMessage');
+  Bus.$off('MessageToBottom');
 })
 </script>
 

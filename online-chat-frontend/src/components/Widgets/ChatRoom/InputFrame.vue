@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import {onMounted, onUnmounted, ref} from "vue";
+import {onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {createFromIconfontCN} from '@ant-design/icons-vue';
 import {useStore} from "vuex";
@@ -29,11 +29,6 @@ const store = useStore();
 const FontIcons = createFromIconfontCN({
   scriptUrl: store.state.urls.icon_font_url
 })
-const textarea = ref();
-const textarea_focus = () => {
-  textarea.value.focus();
-}
-Bus.$on('SendMessage', textarea_focus);
 
 
 const content = ref('');
@@ -54,16 +49,19 @@ const send = () => {
     }, 1000)
   } else {
     content.value = '';
-    Bus.$emit("SendMessage");
+    Bus.$emit("InputFocus");
+    Bus.$emit("MessageToBottom");
   }
 }
 
 
-onMounted(() => {
-  textarea_focus();
-})
+const textarea = ref();
+const textarea_focus = () => {
+  textarea.value.focus();
+}
+Bus.$on('InputFocus', textarea_focus);
 onUnmounted(() => {
-  Bus.$off('SendMessage');
+  Bus.$off('InputFocus');
 })
 
 </script>

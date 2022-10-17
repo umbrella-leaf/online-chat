@@ -7,33 +7,33 @@
           @finishFailed="validFailed"
           ref="formRef">
     <!--输入用户名-->
-    <a-form-item name="username" has-feedback>
+    <a-form-item name="username" has-feedback validate-first>
       <a-input v-model:value="FormState.username" placeholder="请输入用户名" autocomplete="new-password">
         <template #prefix><UserOutlined /></template>
         <template #suffix>
           <ToolTip>
             <template #content>
               ① 用户名不能为空，不能包含空格，只能包含汉字、数字、字母及下划线，且长度在2-15之间 <br>
-              ② 密码必须包含数字、字母、下划线其中任意两种及以上，中间不能包含空格，且长度在8-20之间
+              ② 密码必须包含数字、字母、字符其中任意两种及以上，中间不能包含空格，且长度在8-20之间
             </template>
           </ToolTip>
         </template>
       </a-input>
     </a-form-item>
     <!--输入密码-->
-    <a-form-item name="password" has-feedback>
+    <a-form-item name="password" has-feedback validate-first>
       <a-input-password v-model:value="FormState.password" placeholder="请输入密码" autocomplete="new-password">
         <template #prefix><LockOutlined /></template>
       </a-input-password>
     </a-form-item>
     <!--输入密码-->
-    <a-form-item name="checkPassword" has-feedback>
+    <a-form-item name="checkPassword" has-feedback validate-first>
       <a-input-password v-model:value="FormState.checkPassword" placeholder="请再次输入密码" autocomplete="new-password">
         <template #prefix><LockOutlined /></template>
       </a-input-password>
     </a-form-item>
     <!--输入邮箱-->
-    <a-form-item name="email" has-feedback>
+    <a-form-item name="email" has-feedback validate-first>
       <a-input v-model:value="FormState.email" placeholder="请输入邮箱" autocomplete="new-password">
         <template #prefix><MailOutlined /></template>
         <template #suffix>
@@ -42,7 +42,7 @@
       </a-input>
     </a-form-item>
     <!--输入手机号码-->
-    <a-form-item name="telephone" has-feedback>
+    <a-form-item name="telephone" has-feedback validate-first>
       <a-input v-model:value="FormState.telephone" placeholder="请输入电话号码" autocomplete="new-password">
         <template #prefix><PhoneOutlined /></template>
         <template #suffix>
@@ -51,7 +51,7 @@
       </a-input>
     </a-form-item>
     <!--输入验证码-->
-    <a-form-item name="verifyCode" has-feedback>
+    <a-form-item name="verifyCode" has-feedback validate-first>
       <a-input-search v-model:value="FormState.verifyCode"
                       placeholder="请输入验证码"
                       autocomplete="new-password"
@@ -128,10 +128,10 @@ const resetForm = () => {
 }
 // 自定义密码验证（这一动作包含了修改密码时调用确认密码的验证）
 const validatePassword = async(_rule, value) => {
-  if (FormState.password === '') {
+  if (FormState.password.trim() === '') {
     return Promise.reject('密码不能为空！');
   }
-  const pattern = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?!([^(0-9a-zA-Z)])+$)[^\s]{8,20}$/;
+  const pattern = /^(?![0-9]+$)(?![a-zA-Z]+$)(?!([^(0-9a-zA-Z)])+$)\S{8,20}$/;
   if (!(pattern.test(value))) {
     return Promise.reject('密码格式不正确！');
   }
@@ -145,7 +145,7 @@ const validatePassword = async(_rule, value) => {
 }
 // 自定义确认密码验证
 const checkPassword = async(_rule, value) => {
-  if (value === '') {
+  if (value.trim() === '') {
     return Promise.reject('确认密码不能为空！');
   }
   if (value !== FormState.password) {
@@ -155,7 +155,7 @@ const checkPassword = async(_rule, value) => {
 }
 // 自定义电话号码验证（用于更改电话号时触发验证码的verify）
 const verifyTelephone = async(_rule, value) => {
-  if (value === '') {
+  if (value.trim() === '') {
     return Promise.reject('电话号码不能为空！');
   }
   const pattern = /^1((34[0-8])|(8\d{2})|(([35][0-35-9]|4[579]|66|7[35678]|9[1389])\d))\d{7}$/;
@@ -172,7 +172,7 @@ const verifyTelephone = async(_rule, value) => {
 }
 // 自定义验证码验证
 const checkVerifyCode = async(_rule, value) => {
-  if (value === '') {
+  if (value.trim() === '') {
     return Promise.reject('验证码不能为空！');
   }
   if (value !== lastCodeVerifyCode.value) {
@@ -268,6 +268,7 @@ const SignUp = (value) => {
             .then(response => {
               ResponseToMessage(response, false);
               if (response.data.status === 200) {
+                store.commit('entrance/clearLastCodeVerify', FormState.telephone);
                 router.push('/sign-in');
               }
             })

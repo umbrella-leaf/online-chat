@@ -71,15 +71,15 @@ const router = useRoute();
 const store = useStore();
 
 // // Sidebar collapsed status.
-// const sidebarCollapsed = computed(() => store.state.settings.sidebarCollapsed);
+// const sidebarCollapsed = computed(() => store.state.index.sidebarCollapsed);
 // // Main sidebar color.
-// const sidebarColor = computed(() => store.state.settings.sidebarColor);
+// const sidebarColor = computed(() => store.state.index.sidebarColor);
 // // Main sidebar theme : light, white, dark.
-// const sidebarTheme = computed(() => store.state.settings.sidebarTheme);
+// const sidebarTheme = computed(() => store.state.index.sidebarTheme);
 // // Header fixed status.
-// const navbarFixed = computed(() => store.state.settings.navbarFixed);
+// const navbarFixed = computed(() => store.state.index.navbarFixed);
 // // Settings drawer visibility status.
-// const showSettingsDrawer = computed(() => store.state.settings.showSettingsDrawer);
+// const showSettingsDrawer = computed(() => store.state.index.showSettingsDrawer);
 const {sidebarCollapsed, sidebarColor, sidebarTheme, navbarFixed, showSettingsDrawer}
   = index("settings",
   ["sidebarCollapsed",

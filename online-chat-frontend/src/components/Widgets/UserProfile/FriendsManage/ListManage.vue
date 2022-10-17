@@ -18,7 +18,7 @@
                 <span v-else>正常</span>
               </template>
             </a-list-item-meta>
-            <template #actions>
+            <template #extra>
               <div>
                 <a-popconfirm :title='`确定要屏蔽"${DisplayName(item)}"吗？`'
                               v-if="NoBlack(item)"

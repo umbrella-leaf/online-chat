@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     class="settings-drawer"
-    :class="[rtl ? 'settings-drawer-rtl' : '']"
+    :class="[rtl ? 'index-drawer-rtl' : '']"
     :placement="rtl ? 'left' : 'right'"
     :closable="false"
     :visible="showSettingsDrawer"
