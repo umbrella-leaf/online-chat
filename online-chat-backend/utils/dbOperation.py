@@ -5,7 +5,7 @@ from user.model import User
 from friend.model import FriendShip
 from chat.model import Chat, Message
 from utils.Response import Response, Success, Error
-from utils.Enums import UserState, FriendState
+from utils.Enums import UserState, FriendState, MessageState
 from sqlalchemy import or_, and_, not_
 from time import time
 from datetime import datetime
@@ -257,17 +257,14 @@ class MySQL:
             db.session.commit()
             # 如果是接收申请，就新建一个聊天chat，然后发送一条问候消息
             if accept_time is not None:
+                friendship = FriendShip.query.filter_by(id=friendship_id).first()
                 chat = Chat(friendship_id=friendship_id)
                 db.session.add(chat)
                 db.session.commit()
-                friendship = FriendShip.query.filter_by(id=friendship_id).first()
-                message = Message(chat_id=chat.id, content="我们已经是好友了，快来一起聊天吧！",
-                                  sender_id=friendship.friend_id)
-                db.session.add(message)
-                db.session.commit()
-                chat.latest_msg_id = message.id
-                friendship.message_cnt += 1
-                db.session.commit()
+                res = MySQL.sendNewMessage(chat_id=chat.id, content="我们已经是好友了，快来一起聊天吧！",
+                                           sender_id=friendship.friend_id)
+                if res.status != 200:
+                    return Error()
             return Success()
         except Exception as e:
             db.session.rollback()
@@ -392,6 +389,7 @@ class MySQL:
     @staticmethod
     def filterMessageInfo(message: Message):
         return {
+            'id': message.id,
             'time': message.send_time,
             'content': message.content,
             'status': message.status,
@@ -410,5 +408,34 @@ class MySQL:
         except Exception as e:
             MySQL.errOut(e)
             return Error()
+
+    # 发送聊天消息
+    @staticmethod
+    def sendNewMessage(chat_id, content, sender_id) -> Response:
+        try:
+            chat = Chat.query.filter_by(id=chat_id).first()
+            online = chat.online
+            # 聊天室只有发信者在线，那么发的消息设为（对方）未读状态，否则设为已读
+            if online <= 1:
+                status = MessageState.unread.value
+            else:
+                status = MessageState.read.value
+            message = Message(chat_id=chat_id, content=content, sender_id=sender_id, status=status)
+            # 插入消息到Message表
+            db.session.add(message)
+            db.session.commit()
+            # 更新聊天的latest_msg_id
+            chat.latest_msg_id = message.id
+            db.session.commit()
+            # 好友关系message_cnt + 1
+            friendship = chat.friendship
+            friendship.message_cnt += 1
+            db.session.commit()
+            return Success()
+        except Exception as e:
+            db.session.rollback()
+            MySQL.errOut(e)
+            return Error()
+
 
 
