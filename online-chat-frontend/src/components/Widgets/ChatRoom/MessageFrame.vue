@@ -2,10 +2,11 @@
   <div class="message">
     <div class="message-wrapper" ref="msg_list">
       <ul>
-        <li v-for="(item, i) in MessageList" class="message-item">
-          <div class="time"><span>{{ TimeDisplay(item) }}</span></div>
-          <div class="main" :class="{self: IsSelfSend(item)}">
+        <li v-for="(item, i) in FilterMessageList" class="message-item">
+          <div class="time" v-if="item.type === 'showTime'"><span>{{ item.show }}</span></div>
+          <div class="main" :class="{self: IsSelfSend(item)}" v-else :key="item.id">
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
+            <span v-if="IsSelfSend(item)" class="unread">{{ IsRead(item) ? "已读" : "未读" }}</span>
             <div class="content">
               <div class="text">{{ item.content }}</div>
             </div>
@@ -20,8 +21,7 @@
 import {computed, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {useStore} from "vuex";
-import dayjs from "dayjs";
-import {msgTimeFormat} from "@/utils/time/msgTimeFormat";
+import {msgTimeShowFilter} from "@/utils/time/msgTimeShowFilter";
 
 
 const store = useStore();
@@ -39,13 +39,14 @@ const cur_id = computed(() => store.state.user.info.id);
 const IsSelfSend = (item) => {
   return item.sender_id === cur_id.value;
 }
-// 时间显示格式
-const TimeDisplay = (item) => {
-  return msgTimeFormat(item.time);
+// 判断是否已读
+const IsRead = (item) => {
+  return item.status === 1;
 }
+
 // 按照时间过滤消息
 const FilterMessageList = computed(() => {
-
+  return msgTimeShowFilter(props.MessageList);
 })
 
 const msg_list = ref();

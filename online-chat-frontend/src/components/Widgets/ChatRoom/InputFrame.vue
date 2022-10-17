@@ -48,9 +48,10 @@ const send = () => {
       warn.value = false;
     }, 1000)
   } else {
-    content.value = '';
-    Bus.$emit("InputFocus");
-    Bus.$emit("MessageToBottom");
+    Bus.$emit("SendNewMessage", content.value);
+    // content.value = '';
+    // Bus.$emit("InputFocus");
+    // Bus.$emit("MessageToBottom");
   }
 }
 
@@ -60,8 +61,12 @@ const textarea_focus = () => {
   textarea.value.focus();
 }
 Bus.$on('InputFocus', textarea_focus);
+Bus.$on('ClearInput', () => {
+  content.value = '';
+})
 onUnmounted(() => {
   Bus.$off('InputFocus');
+  Bus.$off('ClearInput');
 })
 
 </script>

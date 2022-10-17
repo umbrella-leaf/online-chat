@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import {computed, ref, watch} from "vue";
+import {computed, nextTick, onUnmounted, ref, watch} from "vue";
 import {useStore} from "vuex";
 import {useRoute} from "vue-router";
 import Bus from "@/utils/EventBus";
@@ -39,6 +39,7 @@ import SessionsList from "@/components/Widgets/ChatRoom/SessionsList";
 import UserInfoRight from "@/components/Widgets/ChatRoom/UserInfoRight";
 import {apiGetChatList} from "@/apis/chat/get-chat-list";
 import {apiGetMessageList} from "@/apis/chat/get-message-list";
+import {apiSendNewMessage} from "@/apis/chat/send-new-message";
 
 
 const route = useRoute();
@@ -94,6 +95,9 @@ const GetChatList = () => {
 }
 GetChatList();
 
+
+// 当前用户ID
+const cur_id = computed(() => store.state.user.info.id);
 // 当前聊天ID
 const chat_id = computed(() => route.params.chat_id)
 // 聊天者信息
@@ -109,6 +113,7 @@ const ChatUserInfo = computed(() => {
 const RefreshFrame = () => {
   Bus.$emit('InputFocus');
   Bus.$emit('MessageToBottom');
+  Bus.$emit('ClearInput');
 }
 // 消息列表
 const MessageList = ref([]);
@@ -120,17 +125,17 @@ const GetMessageList = (chat_id) => {
       if (response.data.status === 200) {
         MessageList.value = response.data.data;
       }
-      RefreshFrame();
+      nextTick(() => {RefreshFrame();});
     })
     .catch(error => {
       console.log(error);
       ReportErrorMessage(error);
-      RefreshFrame();
+      nextTick(() => {RefreshFrame();});
     })
 }
 // 刷新页面时重置消息列表
 if (chat_id.value) {
-  GetMessageList(chat_id.value);
+  GetMessageList(parseInt(chat_id.value));
 }
 // 聊天室id改变时重新获取消息
 watch(() => chat_id.value, (newVal, oldVal) => {
@@ -139,6 +144,41 @@ watch(() => chat_id.value, (newVal, oldVal) => {
     GetMessageList(chat_id);
   }
 })
+
+
+// 发送消息
+const SendNewMessage = (content) => {
+  const params = {
+    chat_id: parseInt(chat_id.value),
+    content: content,
+    sender_id: cur_id.value
+  }
+  apiSendNewMessage(params)
+    .then(response => {
+      ResponseToMessage(response, false);
+      if (response.data.status === 200) {
+        GetMessageList(parseInt(chat_id.value));
+        GetChatList();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
+    })
+}
+
+
+// 给Bus挂载事件
+// 消息发送事件
+Bus.$on('SendNewMessage', (content) => {
+  SendNewMessage(content);
+})
+onUnmounted(() => {
+  Bus.$off('SendNewMessage');
+})
+
+// 建立WebSocket
+
 
 
 </script>

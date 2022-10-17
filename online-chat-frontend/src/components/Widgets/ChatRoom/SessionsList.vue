@@ -8,7 +8,7 @@
       </a-empty>
       <a-list bordered item-layout="horizontal" :data-source="FilterChatList" class="search-result" v-else>
         <template #renderItem="{item}">
-          <a-list-item @click="JumpIntoChat(item)" :class="{'chat-selected': ChatSelected(item)}">
+          <a-list-item @click="JumpIntoChat(item)" :class="{'chat-selected': ChatSelected(item)}" :key="ChatID(item)">
             <a-popover>
               <template #content>
                 <a-card style="width: 200px;">
@@ -80,6 +80,10 @@ const AvatarUrl = (item) => {
 // 展示名字
 const DisplayName = (item) => {
   return item["friend"]?.nickname || item["friend"]?.username;
+}
+// 聊天室ID
+const ChatID = (item) => {
+  return item["chat"]?.id;
 }
 // 最新消息内容
 const LatestMsgContent = (item) => {
