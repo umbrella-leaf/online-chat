@@ -2,7 +2,14 @@ export const SidebarRoutes = [
   {
     path: '/chat-room',
     name: '聊天室',
-    component: () => import("../views/ChatRoom")
+    component: () => import("../views/ChatRoom"),
+    children: [
+      {
+        path: '/chat-room/:chat_id',
+        name: '聊天室',
+        component: () => import("../views/ChatRoom")
+      }
+    ]
   },
   {
     path: '/user-profile',
@@ -13,5 +20,5 @@ export const SidebarRoutes = [
     path: '/user-add',
     name: '添加好友',
     component: () => import("../views/UserSearch")
-  }
+  },
 ]
