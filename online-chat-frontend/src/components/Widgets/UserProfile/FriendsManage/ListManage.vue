@@ -4,7 +4,7 @@
     <a-spin :spinning="loading" tip="加载中……">
       <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ListFriends">
         <template #renderItem="{ item }">
-          <a-list-item>
+          <a-list-item :key="item.user_id">
             <a-list-item-meta>
               <template #avatar>
                 <a-avatar shape="circle" :src="item.avatar_url" />
