@@ -18,6 +18,7 @@ class FriendShip(db.Model):
     status = db.Column(db.Integer, nullable=False, server_default=text(str(FriendState.unaccepted.value)))
     user = db.relationship("User", backref="friendships", foreign_keys=[user_id])
     friend = db.relationship("User", backref="userships", foreign_keys=[friend_id])
+    chat = db.relationship('Chat', uselist=False, backref='friendship')
 
     def __repr__(self):
         return f"<Friend(user_id={self.user_id}, friend_id={self.friend_id})>"
