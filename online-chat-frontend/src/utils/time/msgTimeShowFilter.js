@@ -1,4 +1,5 @@
-import {day} from "./index";
+import {msgTimeFormat} from "./msgTimeFormat";
+import dayjs from "dayjs";
 /**
  * 聊天时间格式化
  * 规则：
@@ -12,7 +13,7 @@ import {day} from "./index";
  * @param type 五分钟规则区分：0-永远跟上一个显示的时间对比是否超5分钟 ；1-永远两条消息对比是否超5分钟
  * @returns {Array|null}
  */
-export function msgTimeShowFilter(currentMessageList, sort, type) {
+export function msgTimeShowFilter(currentMessageList, sort=0, type=0) {
   // console.log('传入的会话数组', currentMessageList)
   const newMessageList = []
   const currentFilterList = currentMessageList.filter((item) => {
@@ -22,38 +23,34 @@ export function msgTimeShowFilter(currentMessageList, sort, type) {
     let showTime;
     if (index === 0) {
       //第一条必显示时间
-      showTime = day(`${item.time}+8`);
+      showTime = msgTimeFormat(item.time);
       newMessageList.push({
-        payload: {
-          text: showTime
-        },
+        show: showTime,
         type: 'showTime',//超五分钟显示时间-标识
         time: item.time
       })
       newMessageList.push(item)
     } else if (index <= currentFilterList.length - 1) {
-      const current = currentFilterList[index].time
-      let minutes
+      const current = dayjs(`${currentFilterList[index].time}+8`);
+      let minutes;
       const showTimeList = newMessageList.filter((item) => {
-        return item.type === 'showTime'
+        return item.type === 'showTime';
       })
-      const lastShowTime = showTimeList[showTimeList.length - 1].time//添加的时间且最后一条，用于对比
+      const lastShowTime = dayjs(`${showTimeList[showTimeList.length - 1].time}+8`);//添加的时间且最后一条，用于对比
       if (type) {
-        const prev = currentFilterList[index - 1].time
-        minutes = (current - prev) / 60
+        const prev = dayjs(`${currentFilterList[index - 1].time}+8`);
+        minutes = current.diff(prev, 'minute');
       }
       if (!sort) {
-        minutes = (current - lastShowTime) / 60
+        minutes = current.diff(lastShowTime, 'minute');
       } else {
-        minutes = (lastShowTime - current) / 60
+        minutes = lastShowTime.diff(current, 'minute');
       }
       //超五分
       if (minutes > 5) {
-        showTime = timestampFormat(date, '-', true)
+        showTime = msgTimeFormat(item.time);
         newMessageList.push({
-          payload: {
-            text: showTime
-          },
+          show: showTime,
           type: 'showTime',
           time: item.time
         })
