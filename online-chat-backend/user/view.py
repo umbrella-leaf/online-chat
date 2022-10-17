@@ -25,7 +25,7 @@ def changeStatus():
     # 手机号参数不存在
     if telephone is None:
         return jsonify(Error(message="未指定手机号，无权限！").to_dict())
-    res = MySQL.checkTel(telephone)
+    res = MySQL.isPhoneExist(telephone)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     # 手机号未注册

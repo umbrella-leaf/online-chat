@@ -4,6 +4,7 @@ from utils.Response import Error, Success, Warn
 from exts import auth_token
 from friend.model import FriendShip
 from utils.Enums import FriendState
+from datetime import datetime
 
 friend_route = Blueprint('friend', __name__)
 
@@ -132,7 +133,7 @@ def AcceptFriendApply():
         return jsonify(Error(message="找不到该好友关系！").to_dict())
     # 同意好友申请（状态置1）
     target_status = FriendState.normal
-    res = MySQL.changeFriendStatus(friendship_id, target_status)
+    res = MySQL.changeFriendStatus(friendship_id, target_status, accept_time=datetime.now().strftime("%Y-%m-%d %X"))
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="已同意好友申请！").to_dict())

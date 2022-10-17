@@ -52,7 +52,7 @@ def signUp():
         return jsonify(Error(message="手机号不能为空！").to_dict())
 
     # 检查手机号是否已被注册
-    res = MySQL.checkTel(telephone)
+    res = MySQL.isPhoneExist(telephone)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     if res.data:
