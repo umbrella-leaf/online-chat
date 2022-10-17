@@ -15,5 +15,11 @@ class FriendState(Enum):
     neg_black = -2  # 被动拉黑
 
 
+class MessageState(Enum):
+    # 消息状态
+    read = 1
+    unread = 0
+
+
 if __name__ == '__main__':
     print(UserState.authorized.value)
