@@ -4,9 +4,9 @@
   border-radius: 8px !important;
   overflow-x: auto;
   .chatroom-left {
-    .ant-avatar {
-      border: 1px solid #c0c0c0;
-    }
+    //.ant-avatar {
+    //  border: 1px solid #c0c0c0;
+    //}
     .userinfo {
       border: none;
       border-radius: 0;
@@ -37,6 +37,11 @@
           font-size: 16px;
           //font-weight: $fw-semibold;
           span {
+            display: inline-block;
+            width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             vertical-align: middle;
           }
         }
@@ -114,6 +119,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            border: 1px solid #c0c0c0;
           }
         }
         .ant-list-item-meta-content {
@@ -129,9 +135,11 @@
             font-size: 14px;
             //font-weight: $fw-semibold;
             span {
+              display: inline-block;
+              width: 250px;
               overflow: hidden;
-              white-space: nowrap;
               text-overflow: ellipsis;
+              white-space: nowrap;
               vertical-align: middle;
             }
           }
@@ -144,6 +152,9 @@
             flex-direction: column;
             align-items: center;
             font-size: 14px;
+            .ant-avatar {
+              border: 2px solid #c0c0c0;
+            }
             .msg_read {
               background-color: #87d068;
             }
@@ -204,6 +215,11 @@
           font-size: 16px;
           //font-weight: $fw-semibold;
           span {
+            display:inline-block;
+            width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             vertical-align: middle;
           }
         }

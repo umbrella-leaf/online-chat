@@ -43,7 +43,7 @@
         float: left;
         margin-left: 15px;
         border-radius: 50%;
-        border: 2px solid #c0c0c0;
+        //border: 1px solid #c0c0c0;
         width: 36px;
         height: 36px;
       }
@@ -79,7 +79,7 @@
       text-align: right;
       .avatar {
         float: right;
-        margin:0 15px;
+        margin:0 15px 0 12px;
       }
       .content {
         background-color: #b2e281;
@@ -91,6 +91,11 @@
           //border-right-color: transparent;
           //border-left-color: #b2e281;
         }
+      }
+      .unread {
+        color: #808080;
+        font-size: 13px;
+        vertical-align: bottom;
       }
     }
   }
