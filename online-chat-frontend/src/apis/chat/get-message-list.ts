@@ -6,8 +6,7 @@ interface GetMessageListParam {
 
 export function apiGetMessageList(param: GetMessageListParam) {
     return httpRequest({
-        url: '/chat/get-message-list',
-        method: 'post',
-        data: param
+        url: `/chat/get-message-list/${param.chat_id}`,
+        method: 'get'
     })
 }
