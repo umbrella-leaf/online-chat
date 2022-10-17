@@ -12,6 +12,7 @@
       border-radius: 0;
       box-shadow: none !important;
       background: transparent;
+      cursor: pointer;
       .ant-card-meta-avatar {
         .ant-avatar {
           width: 70px;
@@ -44,7 +45,9 @@
         position: relative;
         z-index: 1;
         box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09) !important;
-
+        .ant-card-meta-title span {
+          color: #1890ff;
+        }
       }
     }
 
@@ -68,65 +71,88 @@
       }
     }
 
+
     .sessions-list {
       margin-top: 20px;
       background: #ffffff;
       height: 420px;
-      overflow-y: scroll;
-      .ant-list-items {
-        .ant-list-item:hover {
-          position: relative;
-          z-index: 1;
-          box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09) !important;
-        }
-        .ant-list-item:last-of-type {
-          margin-bottom: 6px;
+      .chat-selected {
+        background: rgb(222, 250, 255);
+        .ant-list-item-meta-title span {
+          color: #1890ff;
         }
       }
-      .ant-list-item-meta-avatar{
-        .ant-avatar {
-          width: 54px;
-          height: 54px;
-          background-color: $color-gray-2;
-          box-shadow: $shadow-2;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-      }
-      .ant-list-item-meta-content {
+      .search-empty {
+        height: 420px;
         display: flex;
         flex-direction: column;
-        .ant-list-item-meta-title {
-          margin-top: 5px;
-          line-height: normal;
-        }
-        .ant-list-item-meta-description {
-          margin-top: 5px;
-          color: $color-gray-7;
-          font-size: 13px;
-          //font-weight: $fw-semibold;
-          span {
-            vertical-align: middle;
+        justify-content: center;
+        align-content: center;
+      }
+      .search-result {
+        overflow-y: scroll;
+        .ant-list-items {
+          cursor: pointer;
+          .ant-list-item:hover {
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09) !important;
+            .ant-list-item-meta-title span {
+              color: #1890ff;
+            }
+          }
+          .ant-list-item:last-of-type {
+            margin-bottom: 6px;
           }
         }
-      }
-      .ant-list-item-action {
-        .session-right {
-          height: 57px;
-          justify-content: space-between;
+        .ant-list-item-meta-avatar{
+          .ant-avatar {
+            width: 54px;
+            height: 54px;
+            background-color: $color-gray-2;
+            box-shadow: $shadow-2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+        }
+        .ant-list-item-meta-content {
           display: flex;
           flex-direction: column;
-          align-items: center;
-          font-size: 14px;
-          .msg_read {
-            background-color: #87d068;
+          .ant-list-item-meta-title {
+            margin-top: 5px;
+            line-height: normal;
           }
-          .msg_unread {
-            background-color: #ffffff;
+          .ant-list-item-meta-description {
+            margin-top: 5px;
+            color: $color-gray-7;
+            font-size: 14px;
+            //font-weight: $fw-semibold;
+            span {
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              vertical-align: middle;
+            }
           }
-          span {
-            vertical-align: middle;
+        }
+        .ant-list-item-action {
+          .session-right {
+            height: 57px;
+            justify-content: space-between;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 14px;
+            .msg_read {
+              background-color: #87d068;
+            }
+            .msg_unread {
+              background-color: #ffffff;
+            }
+            span {
+              vertical-align: middle;
+            }
           }
         }
       }
