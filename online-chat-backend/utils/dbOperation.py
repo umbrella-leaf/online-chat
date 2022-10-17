@@ -3,6 +3,7 @@ import base64
 from exts import db, cos
 from user.model import User
 from friend.model import FriendShip
+from chat.model import Chat, Message
 from utils.Response import Response, Success, Error
 from utils.Enums import UserState, FriendState
 from sqlalchemy import or_, and_, not_
@@ -23,17 +24,17 @@ class MySQL:
         try:
             user = User.query.filter_by(telephone=telephone, password=password).first()
             return Success(data=user is not None)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
     # 查询手机号是否重复，返回data=True代表手机号存在，否则不存在
     @staticmethod
-    def checkTel(telephone) -> Response:
+    def isPhoneExist(telephone) -> Response:
         try:
             user = User.query.filter_by(telephone=telephone).first()
             return Success(data=user is not None)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -46,7 +47,7 @@ class MySQL:
             db.session.add(user)
             db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -58,7 +59,7 @@ class MySQL:
             User.query.filter_by(telephone=telephone).delete()
             db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -70,7 +71,7 @@ class MySQL:
             User.query.filter_by(telephone=telephone).update({'status': UserState.authorized.value})
             db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -81,7 +82,7 @@ class MySQL:
         try:
             user = User.query.filter_by(telephone=telephone).first()
             return Success(data=user.user_id)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -91,7 +92,7 @@ class MySQL:
         try:
             user = User.query.filter_by(user_id=user_id).first()
             return Success(data=user is not None)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -101,7 +102,7 @@ class MySQL:
         try:
             user = User.query.filter_by(telephone=telephone).first()
             return Success(data=user.status)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -114,7 +115,8 @@ class MySQL:
             'nickname': user.nickname,
             'signature': user.signature,
             'telephone': user.telephone,
-            'avatar_url': user.avatar_url
+            'avatar_url': user.avatar_url,
+            'email': user.email
         }
 
     # 获取当前用户信息
@@ -123,7 +125,7 @@ class MySQL:
         try:
             user = User.query.filter_by(telephone=telephone).first()
             return Success(data=MySQL.filterUserInfo(user))
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -133,7 +135,7 @@ class MySQL:
         try:
             user = User.query.filter_by(telephone=telephone).first()
             return Success(data=user.avatar_url)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -167,7 +169,7 @@ class MySQL:
             User.query.filter_by(telephone=telephone).update(info_dict)
             db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -200,7 +202,7 @@ class MySQL:
             friend_list = sorted(friend_list, key=lambda x: x['start'], reverse=True)
             # 合起来得到完整的好友列表
             return Success(data=friend_list)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -219,7 +221,7 @@ class MySQL:
             for usership in userships:
                 friend_id_list.append(usership.user.user_id)
             return Success(data=friend_id_list)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -229,7 +231,7 @@ class MySQL:
         try:
             friendship = FriendShip.query.filter_by(id=friendship_id).first()
             return Success(data=friendship is not None)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -239,21 +241,35 @@ class MySQL:
         try:
             friendship = FriendShip.query.filter_by(id=friendship_id).first()
             return Success(data=friendship.user_id)
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
     # 修改好友关系状态
     @staticmethod
-    def changeFriendStatus(friendship_id, status) -> Response:
+    def changeFriendStatus(friendship_id, status, accept_time=None) -> Response:
         try:
             update_dict = {"status": status.value}
-            if status == FriendState.normal:
-                update_dict.setdefault("start_time", datetime.now().strftime("%Y-%m-%d %X"))
+            # 接收申请的同时，更新好友关系的开始时间
+            if accept_time is not None:
+                update_dict.setdefault("start_time", accept_time)
             FriendShip.query.filter_by(id=friendship_id).update(update_dict)
             db.session.commit()
+            # 如果是接收申请，就新建一个聊天chat，然后发送一条问候消息
+            if accept_time is not None:
+                chat = Chat(friendship_id=friendship_id)
+                db.session.add(chat)
+                db.session.commit()
+                friendship = FriendShip.query.filter_by(id=friendship_id).first()
+                message = Message(chat_id=chat.id, content="我们已经是好友了，快来一起聊天吧！",
+                                  sender_id=friendship.friend_id)
+                db.session.add(message)
+                db.session.commit()
+                chat.latest_msg_id = message.id
+                friendship.message_cnt += 1
+                db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -265,7 +281,7 @@ class MySQL:
             FriendShip.query.filter_by(id=friendship_id).delete()
             db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -278,7 +294,7 @@ class MySQL:
             db.session.add(friendship)
             db.session.commit()
             return Success()
-        except pymysql.err as e:
+        except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
             return Error()
@@ -300,7 +316,7 @@ class MySQL:
             if target_user is None:
                 return Success(data={'user_list': [], 'total': 0})
             return Success(data={'user_list': [MySQL.filterUserInfo(target_user)], 'total': 1})
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -328,7 +344,7 @@ class MySQL:
             target_users = users_query.limit(pageSize).offset((curPage - 1) * pageSize)
             target_users = [MySQL.filterUserInfo(target_user) for target_user in target_users]
             return Success(data={'user_list': target_users, 'total': total})
-        except pymysql.err as e:
+        except Exception as e:
             MySQL.errOut(e)
             return Error()
 
@@ -340,3 +356,59 @@ class MySQL:
             return n.is_integer() and str(keyword).count('.') == 0 and int(n) > 0
         except Exception as e:
             return False
+
+    # 判断chat_id对应的聊天是否存在
+    @staticmethod
+    def checkChatByID(chat_id) -> Response:
+        try:
+            chat = Chat.query.filter_by(id=chat_id).first()
+            return Success(data=chat is not None)
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
+
+    # 获取聊天列表
+    @staticmethod
+    def getChatList(user_id) -> Response:
+        try:
+            user = User.query.filter_by(user_id=user_id).first()
+            friendships = user.friendships
+            chat_list = []
+            for friendship in friendships:
+                if friendship.status == FriendState.normal.value:
+                    friend = friendship.friend
+                    res_dict = {'friend': {**MySQL.filterUserInfo(friend)}}
+                    chat = friendship.chat
+                    res_dict.setdefault('chat', {**chat.to_dict()})
+                    res_dict.setdefault('latest_msg', {**chat.latest_msg.to_dict()})
+                    chat_list.append(res_dict)
+            chat_list = sorted(chat_list, key=lambda x: x['latest_msg']['send_time'], reverse=True)
+            return Success(data=chat_list)
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
+
+    # 过滤消息字段
+    @staticmethod
+    def filterMessageInfo(message: Message):
+        return {
+            'time': message.send_time,
+            'content': message.content,
+            'status': message.status,
+            'sender_id': message.sender_id,
+            'sender_avatar': message.sender.avatar_url
+        }
+
+    # 获取聊天消息
+    @staticmethod
+    def getChatMessageList(chat_id) -> Response:
+        try:
+            chat = Chat.query.filter_by(id=chat_id).first()
+            messages = chat.messages
+            message_list = [MySQL.filterMessageInfo(message) for message in messages]
+            return Success(data=message_list)
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
+
+
