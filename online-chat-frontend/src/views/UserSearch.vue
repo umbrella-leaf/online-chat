@@ -31,6 +31,7 @@ import {useStore} from "vuex";
 import Bus from "@/utils/EventBus";
 import SearchInput from "@/components/Widgets/UserSearch/SearchInput";
 import ResultShow from "@/components/Widgets/UserSearch/ResultShow";
+import {chat_socket} from "@/utils/WebSocket";
 
 
 const store = useStore();
@@ -93,6 +94,12 @@ const SendFriendApply = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         SearchUsers({btn: false, add: true});
+        chat_socket.emit("alterFriendship",
+          {
+            type: "apply",
+            cur_id: cur_id.value,
+            receiver_id: item.id
+          });
       }
     })
     .catch(error => {

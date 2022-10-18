@@ -5,7 +5,7 @@
         <a-col :span="24" :md="9" class="chatroom-left">
           <UserInfoLeft :UserInfo="UserInfo" />
           <a-input-search class="search-input" placeholder="搜索联系人" v-model:value="keyword" enter-button />
-          <SessionsList :FilterChatList="FilterChatList" :loading="loading"/>
+          <SessionsList :FilterChatList="FilterChatList" :loading="loading" :total="ChatList.length"/>
         </a-col>
         <a-col :span="24" :md="15" class="chatroom-right">
           <a-card >
@@ -16,7 +16,7 @@
               <MessageFrame :MessageList="MessageList" />
             </a-card-grid>
             <a-card-grid style="width: 100%" :hoverable="false">
-              <InputFrame />
+              <InputFrame :ChatUserInfo="ChatUserInfo"/>
             </a-card-grid>
           </a-card>
         </a-col>
@@ -28,12 +28,13 @@
 <script setup>
 import {computed, nextTick, onUnmounted, ref, watch} from "vue";
 import {useStore} from "vuex";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import Bus from "@/utils/EventBus";
+import {chat_socket} from "@/utils/WebSocket";
 import MessageFrame from '../components/Widgets/ChatRoom/MessageFrame';
 import InputFrame from '../components/Widgets/ChatRoom/InputFrame';
 import {apiGetInfo} from "@/apis/user/get-info";
-import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import UserInfoLeft from "@/components/Widgets/ChatRoom/UserInfoLeft";
 import SessionsList from "@/components/Widgets/ChatRoom/SessionsList";
 import UserInfoRight from "@/components/Widgets/ChatRoom/UserInfoRight";
@@ -42,7 +43,7 @@ import {apiGetMessageList} from "@/apis/chat/get-message-list";
 import {apiSendNewMessage} from "@/apis/chat/send-new-message";
 
 
-const route = useRoute();
+const router = useRouter();
 const store = useStore();
 // 用户信息
 const UserInfo = computed(() => {
@@ -71,10 +72,13 @@ const ChatList = ref([]);
 // 搜索过滤
 const FilterChatList = computed(() => {
   return ChatList.value.filter((item) => {
-    const DisplayName = item.friend?.nickname || item.friend?.username;
+    const DisplayName = item["friend"].nickname || item["friend"].username;
     return DisplayName.includes(keyword.value);
   })
 })
+
+// 当前用户ID
+const cur_id = computed(() => store.state.user.info.id);
 // 获取聊天列表
 const loading = ref(false);
 const GetChatList = () => {
@@ -96,14 +100,12 @@ const GetChatList = () => {
 GetChatList();
 
 
-// 当前用户ID
-const cur_id = computed(() => store.state.user.info.id);
 // 当前聊天ID
-const chat_id = computed(() => route.params.chat_id)
+const chat_id = computed(() => store.state.chat.chat_id);
 // 聊天者信息
 const ChatUserInfo = computed(() => {
   const cur_chat =  ChatList.value.filter((item) => {
-    return item["chat"]?.id.toString() === chat_id.value?.toString();
+    return item["chat"]?.id === chat_id.value;
   });
   if (cur_chat.length) return cur_chat[0]["friend"];
   return {};
@@ -113,7 +115,6 @@ const ChatUserInfo = computed(() => {
 const RefreshFrame = () => {
   Bus.$emit('InputFocus');
   Bus.$emit('MessageToBottom');
-  Bus.$emit('ClearInput');
 }
 // 消息列表
 const MessageList = ref([]);
@@ -133,53 +134,77 @@ const GetMessageList = (chat_id) => {
       nextTick(() => {RefreshFrame();});
     })
 }
-// 刷新页面时重置消息列表
-if (chat_id.value) {
-  GetMessageList(parseInt(chat_id.value));
-}
+
+
+// chat_socket监听
+// 重载页面时，如果当前在聊天页面就加入
+chat_socket.on("connect", () => {
+  if (chat_id.value) {
+    chat_socket.emit("join", {chat_id: chat_id.value, sender_id: cur_id.value, receiver_id: ChatUserInfo.value.id});
+  }
+})
+// 收到消息列表更新推送
+chat_socket.on("updateMessageList", (data) => {
+  if (data["force"] && chat_id.value) {
+    GetMessageList(chat_id.value);
+    return;
+  }
+  if (chat_id.value && chat_id.value === data["chat_id"]) {
+    GetMessageList(chat_id.value);
+  }
+})
+// 收到聊天列表更新推送
+chat_socket.on("updateChatList", (data) => {
+  if (cur_id.value === data["receiver_id"] || cur_id.value === data["sender_id"]) {
+    GetChatList()
+  }
+})
+// 强制退出聊天室
+chat_socket.on("out_of_chat", (data) => {
+  if (chat_id.value === data["chat_id"]) {
+    router.push("/chat-room");
+    MessageList.value = [];
+  }
+})
+
+
 // 聊天室id改变时重新获取消息
 watch(() => chat_id.value, (newVal, oldVal) => {
+  // 聊天窗口切换时清空输入
+  if (oldVal && newVal) Bus.$emit('ClearInput');
+  // 之前是聊天窗口，就离开
+  if (oldVal) {
+    chat_socket.emit("leave", {chat_id: oldVal});
+    const url = `${store.state.urls.backend_url}/chat/close/${oldVal}`;
+    navigator.sendBeacon(url);
+  }
+  // 进入新的聊天窗口就加入
   if (newVal) {
-    const chat_id = parseInt(newVal);
-    GetMessageList(chat_id);
+    chat_socket.emit("join", {chat_id: newVal, sender_id: cur_id.value, receiver_id: ChatUserInfo.value.id});
   }
 })
 
 
-// 发送消息
-const SendNewMessage = (content) => {
-  const params = {
-    chat_id: parseInt(chat_id.value),
-    content: content,
-    sender_id: cur_id.value
+const final = () => {
+  // 聊天窗口关闭/隐藏时退出聊天
+  if (document.visibilityState === "hidden") {
+    if (chat_id.value) {
+      chat_socket.emit("leave", {chat_id: chat_id.value});
+      const url = `${store.state.urls.backend_url}/chat/close/${chat_id.value}`;
+      navigator.sendBeacon(url);
+    }
   }
-  apiSendNewMessage(params)
-    .then(response => {
-      ResponseToMessage(response, false);
-      if (response.data.status === 200) {
-        GetMessageList(parseInt(chat_id.value));
-        GetChatList();
-      }
-    })
-    .catch(error => {
-      console.log(error);
-      ReportErrorMessage(error);
-    })
+  // 聊天窗口可见时加入聊天
+  if (document.visibilityState === "visible") {
+    if (chat_id.value) {
+      chat_socket.emit("join", {chat_id: chat_id.value, sender_id: cur_id.value, receiver_id: ChatUserInfo.value.id});
+    }
+  }
 }
-
-
-// 给Bus挂载事件
-// 消息发送事件
-Bus.$on('SendNewMessage', (content) => {
-  SendNewMessage(content);
-})
+document.addEventListener('visibilitychange', final);
 onUnmounted(() => {
-  Bus.$off('SendNewMessage');
+  document.removeEventListener("visibilitychange", final);
 })
-
-// 建立WebSocket
-
-
 
 </script>
 

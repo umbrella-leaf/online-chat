@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted, ref} from "vue";
+import {computed, onUnmounted} from "vue";
 import {useRoute} from "vue-router";
 import {useStore} from 'vuex';
 import {index} from "@/utils/hooks";
@@ -48,6 +48,8 @@ import SidePart from '../components/Sidebars/SidePart';
 import HeaderPart from '../components/Headers/HeaderPart';
 import FooterPart from "../components/Footers/FooterPart";
 import SettingsDrawer from "../components/Sidebars/SettingsDrawer";
+import {chat_socket} from "@/utils/WebSocket";
+import {message} from "ant-design-vue";
 
 
 Bus.$on('toggleSidebar', (value) => {
@@ -65,6 +67,19 @@ Bus.$on('updateSidebarTheme', (value) => {
 Bus.$on('updateSidebarColor', (value) => {
   store.commit('settings/updateSidebarColor', value);
 });
+
+
+chat_socket.on("notice", (data) => {
+  if (data["type"] === "success") {
+    message.success(data["notice"]);
+  }
+  if (data["type"] === "warning") {
+    message.warning(data["notice"]);
+  }
+  if (data["type"] === "error") {
+    message.error(data["notice"]);
+  }
+})
 
 
 const router = useRoute();

@@ -4,10 +4,10 @@
     <a-spin :spinning="loading" tip="加载中……">
       <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ApplyFriends">
         <template #renderItem="{ item }">
-          <a-list-item :key="item.user_id">
+          <a-list-item :key="item['user']?.id">
             <a-list-item-meta>
               <template #avatar>
-                <a-avatar shape="circle" :src="item.avatar_url" />
+                <a-avatar shape="circle" :src="item['user']?.avatar_url" />
               </template>
               <template #title>
                 <span class="friend-nickname">{{ DisplayName(item) }}</span>
@@ -49,6 +49,7 @@ import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import Bus from "@/utils/EventBus";
 import {apiRefuseFriendApply} from "@/apis/friend/refuse-friend-apply";
 import {apiCancelFriendApply} from "@/apis/friend/cancel-friend-apply";
+import {chat_socket} from "@/utils/WebSocket";
 
 
 const store = useStore();
@@ -67,7 +68,7 @@ const props = defineProps({
 const cur_id = computed(() => store.state.user.info.id);
 // 用户名称显示文本
 const DisplayName = (item) => {
-  return item.nickname || item.username;
+  return item['user']?.nickname || item['user']?.username;
 }
 // 判断申请是当前用户发出的还是接收的（主动发出的话cur_id应该等于好友关系中的pos_id）
 const PositiveApply = (item) => {
@@ -93,6 +94,12 @@ const AcceptFriendApply = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        chat_socket.emit("alterFriendship",
+          {
+            type: "accept",
+            cur_id: cur_id.value,
+            receiver_id: item['user']?.id
+          });
       }
     })
     .catch(error => {
@@ -107,6 +114,12 @@ const RefuseFriendApply = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        chat_socket.emit("alterFriendship",
+          {
+            type: "refuse",
+            cur_id: cur_id.value,
+            receiver_id: item['user']?.id
+          });
       }
     })
     .catch(error => {

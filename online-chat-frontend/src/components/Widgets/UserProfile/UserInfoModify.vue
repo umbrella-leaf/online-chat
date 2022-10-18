@@ -76,8 +76,11 @@ import {message} from "ant-design-vue";
 import {apiChangeInfo} from "@/apis/user/change-info";
 import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import Bus from "@/utils/EventBus";
+import {chat_socket} from "@/utils/WebSocket";
+import {useStore} from "vuex";
 
 
+const store = useStore();
 const props = defineProps({
   UserInfo: {
     type: Object,
@@ -88,6 +91,8 @@ const props = defineProps({
 const UserInfo = computed(() => {
   return props.UserInfo;
 })
+// 当前用户ID
+const cur_id = computed(() => store.state.user.info.id);
 // 提交表单设置，同时设置监听
 const FormState = ref({
   nickname: UserInfo.value.nickname,
@@ -205,6 +210,7 @@ const ChangeInfo = () => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateUserInfo');
+        chat_socket.emit("modifyInfo", {cur_id: cur_id.value});
       }
     })
     .catch(error => {
