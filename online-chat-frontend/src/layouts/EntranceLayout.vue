@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import {onMounted, onUnmounted, ref} from "vue";
+import {onUnmounted, ref} from "vue";
 import {onBeforeRouteUpdate, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import Bus from "@/utils/EventBus";

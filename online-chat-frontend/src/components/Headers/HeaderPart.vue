@@ -204,6 +204,7 @@ onMounted(() => {
   // 设置wrapper
   wrapper.value = document.getElementById('layout-dashboard');
 })
+
 onUnmounted(() => {
   window.removeEventListener('resize', resizeEventHandler);
 })
