@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, g, request, make_response
-from flask_socketio import SocketIO
 from flask_cors import CORS
 from utils.Response import Success, Warn, Error
 from utils.Token import Token
@@ -9,6 +8,7 @@ from entrance.view import entrance_route
 from user.view import user_route
 from friend.view import friend_route
 from chat.view import chat_route
+import chat.socket
 import config
 import re
 
@@ -16,6 +16,7 @@ app = Flask(__name__)
 app.config.from_object(config)
 app.secret_key = '\xc9ixnRb\xe40\xd4\xa5\x7f\x03\xd0y6\x01\x1f\x96\xeao+\x8a\x9f\xe4'
 db.init_app(app)
+# db.drop_all(app=app)
 db.create_all(app=app)
 # 注册蓝图
 app.register_blueprint(entrance_route, url_prefix='/')
@@ -25,8 +26,7 @@ app.register_blueprint(chat_route, url_prefix='/chat')
 # 初始化CORS跨域模块
 CORS(app, supports_credentials=True)
 # 为app绑定webSocket
-socketio = SocketIO()
-socketio.init_app(app)
+socketio.init_app(app, cors_allowed_origins='*')
 
 
 # 用户名和密码验证
