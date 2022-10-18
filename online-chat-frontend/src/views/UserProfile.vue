@@ -13,6 +13,7 @@
             <template #title>
               <span>亲密度排行</span>
             </template>
+
           </a-card>
         </a-col>
       </a-row>
@@ -29,6 +30,7 @@ import UserInfoModify from "@/components/Widgets/UserProfile/UserInfoModify";
 import Bus from "@/utils/EventBus"
 import FriendsManage from "@/components/Widgets/UserProfile/FriendsManage";
 import {apiGetFriendList} from "@/apis/friend/get-friend-list";
+import {chat_socket} from "@/utils/WebSocket";
 
 const store = useStore();
 
@@ -74,6 +76,10 @@ const GetFriendList = () => {
     })
 }
 GetFriendList();
+
+chat_socket.on("updateFriendList", (data) => {
+  GetFriendList();
+})
 
 
 Bus.$on('updateUserInfo', () => {
