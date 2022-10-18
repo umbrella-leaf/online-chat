@@ -1,7 +1,12 @@
 <template>
   <div class="sessions-list" >
     <a-spin :spinning="loading" tip="加载中……">
-      <a-empty v-if="FilterChatList.length === 0" class="search-empty">
+      <a-empty v-if="total === 0" class="search-empty">
+        <template #description>
+          <span>还没有好友哦，快去添加吧</span>
+        </template>
+      </a-empty>
+      <a-empty v-else-if="FilterChatList.length === 0" class="search-empty">
         <template #description>
           <span>未搜索到好友</span>
         </template>
@@ -11,7 +16,7 @@
           <a-list-item @click="JumpIntoChat(item)" :class="{'chat-selected': ChatSelected(item)}" :key="ChatID(item)">
             <a-popover>
               <template #content>
-                <a-card style="width: 200px;">
+                <a-card style="width: 250px;">
                   <a-card-meta>
                     <template #title>{{ DisplayName(item) }}</template>
                     <template #avatar>
@@ -40,7 +45,7 @@
             <template #actions>
               <div class="session-right">
                 <a-avatar class="msg_read" v-if="!LatestMsgUnread(item)">✔</a-avatar>
-                <a-avatar class="msg_unread" v-else></a-avatar>
+                <a-badge :count="UnreadMsgCount(item)" class="msg_unread" v-else></a-badge>
                 <span>{{LatestMsgTime(item)}}</span>
               </div>
             </template>
@@ -69,6 +74,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  total: {
+    type: Number,
+    default: 0
   }
 })
 // 当前用户ID
@@ -99,6 +108,10 @@ const LatestMsgTime = (item) => {
 // 最新消息是否未读
 const LatestMsgUnread = (item) => {
   return item["latest_msg"]?.sender_id !== cur_id.value && item["latest_msg"]?.status === 0;
+}
+// 未读消息数
+const UnreadMsgCount = (item) => {
+  return item["chat"]?.unread;
 }
 
 

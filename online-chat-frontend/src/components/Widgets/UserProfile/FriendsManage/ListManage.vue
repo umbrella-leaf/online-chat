@@ -4,10 +4,10 @@
     <a-spin :spinning="loading" tip="加载中……">
       <a-list item-layout="horizontal" :data-source="searching ? FilterFriendList : ListFriends">
         <template #renderItem="{ item }">
-          <a-list-item :key="item.user_id">
+          <a-list-item :key="item['user']?.id">
             <a-list-item-meta>
               <template #avatar>
-                <a-avatar shape="circle" :src="item.avatar_url" />
+                <a-avatar shape="circle" :src="item['user']?.avatar_url" />
               </template>
               <template #title>
                 <span class="friend-nickname">{{ DisplayName(item) }}</span>
@@ -51,6 +51,7 @@ import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import Bus from "@/utils/EventBus";
 import {apiWhiteFriend} from "@/apis/friend/white-friend";
 import {apiDeleteFriend} from "@/apis/friend/delete-friend";
+import {chat_socket} from "@/utils/WebSocket";
 
 
 const store = useStore();
@@ -68,7 +69,7 @@ const props = defineProps({
 const cur_id = computed(() => store.state.user.info.id);
 // 用户名称显示文本
 const DisplayName = (item) => {
-  return item.nickname || item.username;
+  return item['user']?.nickname || item['user']?.username;
 }
 // 判断关系状态
 // 未屏蔽
@@ -105,6 +106,13 @@ const BlackFriend = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        chat_socket.emit("alterFriendship",
+          {
+            type: "black",
+            cur_id: cur_id.value,
+            receiver_id: item['user']?.id,
+            friendship_id: item.id
+          });
       }
     })
     .catch(error => {
@@ -119,6 +127,12 @@ const WhiteFriend = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        chat_socket.emit("alterFriendship",
+          {
+            type: "white",
+            cur_id: cur_id.value,
+            receiver_id: item['user']?.id
+          });
       }
     })
     .catch(error => {
@@ -132,7 +146,16 @@ const DeleteFriend = (item) => {
     .then(response => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
+        // 获取删除的聊天ID
+        const chat_id = response.data.data["chat_id"];
         Bus.$emit('updateFriendList');
+        chat_socket.emit("alterFriendship",
+          {
+            type: "delete",
+            cur_id: cur_id.value,
+            receiver_id: item['user']?.id,
+            chat_id: chat_id
+          });
       }
     })
     .catch(error => {
