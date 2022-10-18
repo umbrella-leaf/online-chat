@@ -1,6 +1,6 @@
 from flask import Blueprint, request, g, jsonify
 from utils.dbOperation import MySQL
-from utils.Response import Response, Error, Success
+from utils.Response import Response, Error, Success, Warn
 from exts import auth_token, db
 from chat.model import Chat, Message
 
@@ -27,13 +27,16 @@ def GetChatList():
 @chat_route.route('/get-message-list/<chat_id>', methods=['GET'])
 @auth_token.login_required
 def GetMessageList(chat_id):
+    cur_id = g.user_id
     if chat_id is None:
         return jsonify(Error(message="聊天ID不能为空!").to_dict())
-    res = MySQL.checkChatByID(chat_id)
+    res = MySQL.checkChatExist(chat_id, cur_id)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
-    if not res.data:
-        return jsonify(Error(message="聊天室不存在！").to_dict())
+    if res.data == "delete":
+        return jsonify(Warn(message="您已被好友删除！").to_dict())
+    if res.data == "black":
+        return jsonify(Warn(message="您已被好友屏蔽！").to_dict())
     res = MySQL.getChatMessageList(chat_id)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
@@ -44,6 +47,7 @@ def GetMessageList(chat_id):
 @chat_route.route('/send-new-message/<chat_id>', methods=['POST'])
 @auth_token.login_required
 def SendNewMessage(chat_id):
+    cur_id = g.user_id
     if chat_id is None:
         return jsonify(Error(message="聊天ID不能为空!").to_dict())
     content = request.json.get('content')
@@ -52,7 +56,25 @@ def SendNewMessage(chat_id):
     sender_id = request.json.get('sender_id')
     if sender_id is None:
         return jsonify(Error(message="发送者ID不能为空!").to_dict())
+    res = MySQL.checkChatExist(chat_id, cur_id)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    if res.data == "delete":
+        return jsonify(Warn(message="您已被好友删除！").to_dict())
+    if res.data == "black":
+        return jsonify(Warn(message="您已被好友屏蔽！").to_dict())
     res = MySQL.sendNewMessage(chat_id, content, sender_id)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="消息发送成功！").to_dict())
+
+
+# 退出聊天室
+@chat_route.route('/close/<chat_id>', methods=['POST'])
+def CloseChatRoom(chat_id):
+    if chat_id:
+        res = MySQL.leaveChatRoom(chat_id)
+        if res.status != 200:
+            return jsonify(Error.error.to_dict())
+    return "已退出聊天"
+
