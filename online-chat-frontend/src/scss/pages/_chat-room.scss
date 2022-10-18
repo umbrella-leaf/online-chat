@@ -95,6 +95,7 @@
         align-content: center;
       }
       .search-result {
+        height: 420px;
         overflow-y: scroll;
         .ant-list-items {
           cursor: pointer;
@@ -119,7 +120,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid #c0c0c0;
+            //border: 1px solid #c0c0c0;
           }
         }
         .ant-list-item-meta-content {
@@ -147,7 +148,7 @@
         .ant-list-item-action {
           .session-right {
             height: 57px;
-            justify-content: space-between;
+            justify-content: space-evenly;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -160,6 +161,14 @@
             }
             .msg_unread {
               background-color: #ffffff;
+            }
+            .ant-badge-count {
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
             span {
               vertical-align: middle;
