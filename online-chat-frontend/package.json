@@ -13,6 +13,7 @@
     "dayjs": "^1.11.5",
     "js-md5": "^0.7.3",
     "moment": "^2.29.4",
+    "socket.io-client": "^4.5.3",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
     "vue-github-buttons": "^3.1.0",
