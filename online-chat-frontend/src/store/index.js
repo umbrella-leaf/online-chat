@@ -3,6 +3,7 @@ import {settings} from "@/store/settings";
 import {urls} from "@/store/urls";
 import {entrance} from "@/store/entrance";
 import {user} from "@/store/user";
+import {chat} from "@/store/chat";
 import createPersistedState from 'vuex-persistedstate';
 
 export default createStore({
@@ -18,13 +19,14 @@ export default createStore({
     settings,
     urls,
     entrance,
-    user
+    user,
+    chat
   },
   plugins: [
     createPersistedState({
       // storage: window.sessionStorage,
       key: 'online-chat-client',
-      path: ['settings', 'urls', 'entrance', 'user']
+      path: ['settings', 'urls', 'entrance', 'user', 'chat']
     })
   ]
 })
