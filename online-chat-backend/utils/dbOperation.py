@@ -6,7 +6,7 @@ from friend.model import FriendShip
 from chat.model import Chat, Message
 from utils.Response import Response, Success, Error
 from utils.Enums import UserState, FriendState, MessageState
-from sqlalchemy import or_, and_, not_
+from sqlalchemy import or_, and_, not_, func
 from time import time
 from datetime import datetime
 import pymysql
@@ -129,12 +129,12 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
-    # 查询用户头像地址
+    # 查询用户名字
     @staticmethod
-    def getAvatarUrl(telephone) -> Response:
+    def getUserNameByID(user_id) -> Response:
         try:
-            user = User.query.filter_by(telephone=telephone).first()
-            return Success(data=user.avatar_url)
+            user = User.query.filter_by(user_id=user_id).first()
+            return Success(data=user.nickname if user.nickname is not None else user.user_name)
         except Exception as e:
             MySQL.errOut(e)
             return Error()
@@ -184,7 +184,7 @@ class MySQL:
             friend_list = []
             # 用户是主动加好友一方
             for friendship in friendships:
-                friend_list.append({**MySQL.filterUserInfo(friendship.friend),
+                friend_list.append({"user": {**MySQL.filterUserInfo(friendship.friend)},
                                     'id': friendship.id,
                                     'start': friendship.start_time,
                                     'status': friendship.status,
@@ -192,7 +192,7 @@ class MySQL:
                                     'neg_id': friendship.friend_id})
             # 用户是被动加好友一方
             for usership in userships:
-                friend_list.append({**MySQL.filterUserInfo(usership.user),
+                friend_list.append({"user": {**MySQL.filterUserInfo(usership.user)},
                                     'id': usership.id,
                                     'start': usership.start_time,
                                     'status': usership.status,
@@ -208,7 +208,7 @@ class MySQL:
 
     # 获取全部好友的ID（包括四个状态的好友关系，只要有好友关系就获取）
     @staticmethod
-    def getAllFriendID(user_id) -> Response:
+    def getAllFriendID(user_id, normal=False, active=False) -> Response:
         try:
             user = User.query.filter_by(user_id=user_id).first()
             # 获取主动添加好友列表
@@ -217,8 +217,16 @@ class MySQL:
             userships = user.userships
             friend_id_list = []
             for friendship in friendships:
+                if normal and friendship.status != FriendState.normal.value:
+                    continue
+                if active and friendship.chat.online < 1:
+                    continue
                 friend_id_list.append(friendship.friend.user_id)
             for usership in userships:
+                if normal and usership.status != FriendState.normal.value:
+                    continue
+                if active and usership.chat.online < 1:
+                    continue
                 friend_id_list.append(usership.user.user_id)
             return Success(data=friend_id_list)
         except Exception as e:
@@ -262,7 +270,7 @@ class MySQL:
                 db.session.add(chat)
                 db.session.commit()
                 res = MySQL.sendNewMessage(chat_id=chat.id, content="我们已经是好友了，快来一起聊天吧！",
-                                           sender_id=friendship.friend_id)
+                                           sender_id=friendship.user_id)
                 if res.status != 200:
                     return Error()
             return Success()
@@ -275,9 +283,14 @@ class MySQL:
     @staticmethod
     def deleteFriendShip(friendship_id) -> Response:
         try:
+            chat = Chat.query.filter_by(friendship_id=friendship_id).first()
+            chat_id = None
+            # 如果是删除好友（聊天室存在），额外返回删除的聊天ID
+            if chat is not None:
+                chat_id = chat.id
             FriendShip.query.filter_by(id=friendship_id).delete()
             db.session.commit()
-            return Success()
+            return Success(data=chat_id)
         except Exception as e:
             db.session.rollback()
             MySQL.errOut(e)
@@ -354,12 +367,12 @@ class MySQL:
         except Exception as e:
             return False
 
-    # 判断chat_id对应的聊天是否存在
+    # 通过friendship_id找chat_id
     @staticmethod
-    def checkChatByID(chat_id) -> Response:
+    def getChatIDByFriendShipID(friendship_id) -> Response:
         try:
-            chat = Chat.query.filter_by(id=chat_id).first()
-            return Success(data=chat is not None)
+            friendship = FriendShip.query.filter_by(id=friendship_id).first()
+            return Success(data=friendship.chat.id)
         except Exception as e:
             MySQL.errOut(e)
             return Error()
@@ -370,13 +383,34 @@ class MySQL:
         try:
             user = User.query.filter_by(user_id=user_id).first()
             friendships = user.friendships
+            userships = user.userships
             chat_list = []
             for friendship in friendships:
                 if friendship.status == FriendState.normal.value:
                     friend = friendship.friend
                     res_dict = {'friend': {**MySQL.filterUserInfo(friend)}}
                     chat = friendship.chat
-                    res_dict.setdefault('chat', {**chat.to_dict()})
+                    # 查找我的未读消息数
+                    unread = db.session.query(func.count(Message.id)).filter(Message.chat_id == chat.id,
+                                                                             Message.sender_id != user_id,
+                                                                             Message.status == MessageState.unread.value).scalar()
+                    chat_dict = chat.to_dict()
+                    chat_dict.update({"unread": unread})
+                    res_dict.setdefault('chat', chat_dict)
+                    res_dict.setdefault('latest_msg', {**chat.latest_msg.to_dict()})
+                    chat_list.append(res_dict)
+            for usership in userships:
+                if usership.status == FriendState.normal.value:
+                    friend = usership.user
+                    res_dict = {'friend': {**MySQL.filterUserInfo(friend)}}
+                    chat = usership.chat
+                    # 查找我的未读消息数
+                    unread = db.session.query(func.count(Message.id)).filter(Message.chat_id == chat.id,
+                                                                             Message.sender_id != user_id,
+                                                                             Message.status == MessageState.unread.value).scalar()
+                    chat_dict = chat.to_dict()
+                    chat_dict.update({"unread": unread})
+                    res_dict.setdefault('chat', chat_dict)
                     res_dict.setdefault('latest_msg', {**chat.latest_msg.to_dict()})
                     chat_list.append(res_dict)
             chat_list = sorted(chat_list, key=lambda x: x['latest_msg']['send_time'], reverse=True)
@@ -409,6 +443,24 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
+    # 检查当前聊天是否还存在（是否已被删除或屏蔽）
+    @staticmethod
+    def checkChatExist(chat_id, cur_id) -> Response:
+        try:
+            chat = Chat.query.filter_by(id=chat_id).first()
+            # 聊天不存在，被删除
+            if chat is None:
+                return Success(data="delete")
+            friendship = chat.friendship
+            # 聊天被另一方屏蔽：我是被动方且被主动方屏蔽或我是主动方且被被动方屏蔽
+            if (cur_id == friendship.friend_id and friendship.status == FriendState.pos_black.value) \
+                    or (cur_id == friendship.user_id and friendship.status == FriendState.neg_black.value):
+                return Success(data="black")
+            return Success(data="normal")
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
+
     # 发送聊天消息
     @staticmethod
     def sendNewMessage(chat_id, content, sender_id) -> Response:
@@ -431,6 +483,43 @@ class MySQL:
             friendship = chat.friendship
             friendship.message_cnt += 1
             db.session.commit()
+            return Success()
+        except Exception as e:
+            db.session.rollback()
+            MySQL.errOut(e)
+            return Error()
+
+    # 进入聊天室
+    @staticmethod
+    def enterChatRoom(chat_id, cur_id) -> Response:
+        try:
+            # 聊天室在线人数+1
+            chat = Chat.query.filter_by(id=chat_id).first()
+            chat.online += 1
+            db.session.commit()
+            # 所有我收到的消息(不是我发送的）设为已读
+            messages = chat.messages
+            for message in messages:
+                if message.sender_id != cur_id:
+                    message.status = MessageState.read.value
+                    db.session.commit()
+            return Success()
+        except Exception as e:
+            db.session.rollback()
+            MySQL.errOut(e)
+            return Error()
+
+    # 离开聊天室
+    @staticmethod
+    def leaveChatRoom(chat_id) -> Response:
+        try:
+            # 聊天室在线人数-1
+            chat = Chat.query.filter_by(id=chat_id).first()
+            if chat is not None:
+                # 防止部分浏览器问题导致多次执行-1
+                if chat.online > 0:
+                    chat.online -= 1
+                    db.session.commit()
             return Success()
         except Exception as e:
             db.session.rollback()
