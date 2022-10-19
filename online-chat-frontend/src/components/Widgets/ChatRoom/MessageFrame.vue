@@ -3,7 +3,7 @@
     <div class="message-wrapper" ref="msg_list">
       <ul>
         <li v-for="(item, i) in FilterMessageList" class="message-item">
-          <div class="time" v-if="item.type === 'showTime'"><span>{{ item.show }}</span></div>
+          <div class="time" v-if="item.type === 'showTime'"><span v-html="item.show"></span></div>
           <div class="main" :class="{self: IsSelfSend(item)}" v-else :key="item.id">
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
             <span v-if="IsSelfSend(item)" class="unread">{{ IsRead(item) ? "已读" : "未读" }}</span>

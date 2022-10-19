@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onUnmounted, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from "vue";
 import {useStore} from "vuex";
 import {useRoute, useRouter} from "vue-router";
 import Bus from "@/utils/EventBus";
@@ -183,6 +183,14 @@ watch(() => chat_id.value, (newVal, oldVal) => {
     chat_socket.emit("join", {chat_id: newVal, sender_id: cur_id.value, receiver_id: ChatUserInfo.value.id});
   }
 })
+// 加一个setInterval，每天0点更新一次聊天列表和消息列表（如果此时正在聊天室里）
+const updateDataWhenZeroClock = setInterval(() => {
+    const now_date = new Date();
+    if (now_date.getHours() === 0 && now_date.getMinutes() === 0 && now_date.getSeconds() === 0) {
+      GetChatList();
+      if (chat_id.value) GetMessageList(chat_id.value);
+    }
+  }, 1000);
 
 
 const final = () => {
@@ -204,6 +212,10 @@ const final = () => {
 document.addEventListener('visibilitychange', final);
 onUnmounted(() => {
   document.removeEventListener("visibilitychange", final);
+  chat_socket.off("updateMessageList");
+  chat_socket.off("updateChatList");
+  chat_socket.off("out_of_chat");
+  clearInterval(updateDataWhenZeroClock);
 })
 
 </script>

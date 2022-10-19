@@ -107,6 +107,7 @@ const {sidebarCollapsed, sidebarColor, sidebarTheme, navbarFixed, showSettingsDr
 // Sets layout's element's class based on route's meta data.
 const layoutClass = computed(() => router.meta.layoutClass);
 onUnmounted(() => {
+  chat_socket.off("notice");
   Bus.$off('toggleSidebar');
   Bus.$off('toggleSettingsDrawer');
   Bus.$off('toggleNavbarPosition');

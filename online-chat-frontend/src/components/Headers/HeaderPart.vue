@@ -102,6 +102,7 @@ import {useStore} from "vuex";
 import Bus from '@/utils/EventBus';
 import {Modal} from "ant-design-vue";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue"
+import {chat_socket} from "@/utils/WebSocket";
 
 const route = useRoute();
 const store = useStore();
@@ -190,6 +191,7 @@ const SignOut = (e) => {
     okText: "确认",
     cancelText: "取消",
     onOk() {
+      // chat_socket.disconnect();
       store.commit('user/deleteToken');
       store.commit('user/deleteUserInfo');
       router.push('/sign-in');

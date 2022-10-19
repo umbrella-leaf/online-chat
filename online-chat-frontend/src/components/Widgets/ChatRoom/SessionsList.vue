@@ -32,7 +32,12 @@
               </template>
               <a-list-item-meta>
                 <template #avatar>
-                  <a-avatar :src="AvatarUrl(item)"></a-avatar>
+                  <a-badge v-if="!LatestMsgUnread(item)" count="✔" :number-style="{ backgroundColor: '#52c41a' }">
+                    <a-avatar :src="AvatarUrl(item)" />
+                  </a-badge>
+                  <a-badge v-else :count="UnreadMsgCount(item)">
+                    <a-avatar :src="AvatarUrl(item)" />
+                  </a-badge>
                 </template>
                 <template #title>
                   <span>{{ DisplayName(item) }}</span>
@@ -43,11 +48,7 @@
               </a-list-item-meta>
             </a-popover>
             <template #actions>
-              <div class="session-right">
-                <a-avatar class="msg_read" v-if="!LatestMsgUnread(item)">✔</a-avatar>
-                <a-badge :count="UnreadMsgCount(item)" class="msg_unread" v-else></a-badge>
-                <span>{{LatestMsgTime(item)}}</span>
-              </div>
+              <span v-html="LatestMsgTime(item)"></span>
             </template>
           </a-list-item>
         </template>
@@ -60,7 +61,7 @@
 import {useStore} from "vuex";
 import {useRouter, useRoute} from "vue-router";
 import {computed} from "vue";
-import dayjs from "dayjs";
+import {msgTimeFormat} from "@/utils/time/msgTimeFormat";
 
 
 const store = useStore();
@@ -100,10 +101,7 @@ const LatestMsgContent = (item) => {
 }
 // 最新消息时间
 const LatestMsgTime = (item) => {
-  if (item["latest_msg"]?.send_time) {
-    return dayjs(`${item["latest_msg"]?.send_time}+8`).fromNow();
-  }
-  return '';
+  return msgTimeFormat(item["latest_msg"]?.send_time, true);
 }
 // 最新消息是否未读
 const LatestMsgUnread = (item) => {

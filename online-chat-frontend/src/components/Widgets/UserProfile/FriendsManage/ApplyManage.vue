@@ -94,6 +94,7 @@ const AcceptFriendApply = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        Bus.$emit('updateIntimacyRank');
         chat_socket.emit("alterFriendship",
           {
             type: "accept",

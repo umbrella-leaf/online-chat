@@ -9,12 +9,7 @@
           <FriendsManage :FriendList="FriendList" :loading="loading"/>
         </a-col>
         <a-col :span="24" :md="8">
-          <a-card class="intimacy-rank">
-            <template #title>
-              <span>亲密度排行</span>
-            </template>
-
-          </a-card>
+          <IntimacyRank :IntimacyRankList="IntimacyRankList" :loading="loading1"/>
         </a-col>
       </a-row>
     </a-card>
@@ -31,6 +26,8 @@ import Bus from "@/utils/EventBus"
 import FriendsManage from "@/components/Widgets/UserProfile/FriendsManage";
 import {apiGetFriendList} from "@/apis/friend/get-friend-list";
 import {chat_socket} from "@/utils/WebSocket";
+import IntimacyRank from "@/components/Widgets/UserProfile/IntimacyRank";
+import {apiGetIntimacyRank} from "@/apis/friend/get-intimacy-rank";
 
 const store = useStore();
 
@@ -77,8 +74,34 @@ const GetFriendList = () => {
 }
 GetFriendList();
 
+
+// 亲密度排行列表刷新标识
+const loading1 = ref(false);
+// 获取亲密度列表
+const IntimacyRankList = ref([]);
+const GetIntimacyRank = () => {
+  loading1.value = true;
+  apiGetIntimacyRank()
+    .then(response => {
+      ResponseToMessage(response, false);
+      if (response.data.status === 200) {
+        IntimacyRankList.value = response.data.data;
+      }
+      loading1.value = false;
+    })
+    .catch(error => {
+      console.log(error);
+      ReportErrorMessage(error);
+    })
+}
+GetIntimacyRank();
+
+
 chat_socket.on("updateFriendList", (data) => {
   GetFriendList();
+});
+chat_socket.on("updateIntimacyRank", (data) => {
+  GetIntimacyRank();
 })
 
 
@@ -88,9 +111,15 @@ Bus.$on('updateUserInfo', () => {
 Bus.$on('updateFriendList', () => {
   GetFriendList();
 })
+Bus.$on('updateIntimacyRank', () => {
+  GetIntimacyRank();
+})
 onUnmounted(() => {
+  chat_socket.off("updateFriendList");
+  chat_socket.off("updateIntimacyRank");
   Bus.$off('updateUserInfo');
   Bus.$off('updateFriendList');
+  Bus.$off('updateIntimacyRank');
 })
 
 </script>

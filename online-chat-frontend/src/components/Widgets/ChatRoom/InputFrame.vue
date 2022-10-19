@@ -2,8 +2,8 @@
   <div class="input">
     <div class="emoji">
       <div class="operations" style="width: 11%;">
-        <FontIcons type="icon-EMOTION" />
-        <FontIcons type="icon-organicsearch" />
+        <FontIcons type="icon-emotion-line" />
+        <FontIcons type="icon-search" />
       </div>
     </div>
     <a-textarea ref="textarea" v-model:value="content" @keyup="onKeyup" placeholder="输入信息，按enter发送"></a-textarea>

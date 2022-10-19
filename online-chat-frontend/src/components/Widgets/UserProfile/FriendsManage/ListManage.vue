@@ -106,6 +106,7 @@ const BlackFriend = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        Bus.$emit('updateIntimacyRank');
         chat_socket.emit("alterFriendship",
           {
             type: "black",
@@ -127,6 +128,7 @@ const WhiteFriend = (item) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateFriendList');
+        Bus.$emit('updateIntimacyRank');
         chat_socket.emit("alterFriendship",
           {
             type: "white",
@@ -149,6 +151,7 @@ const DeleteFriend = (item) => {
         // 获取删除的聊天ID
         const chat_id = response.data.data["chat_id"];
         Bus.$emit('updateFriendList');
+        Bus.$emit('updateIntimacyRank');
         chat_socket.emit("alterFriendship",
           {
             type: "delete",
