@@ -84,9 +84,10 @@ def DeleteFriend():
         return jsonify(Error(message="找不到该好友关系！").to_dict())
     # 删除好友关系
     res = MySQL.deleteFriendShip(friendship_id)
+    chat_id = res.data
     if res.status != 200:
         return jsonify(Error.error.to_dict())
-    return jsonify(Success(message="删除好友成功！").to_dict())
+    return jsonify(Success(message="删除好友成功！", data={"chat_id": chat_id}).to_dict())
 
 
 # 添加好友
@@ -177,4 +178,15 @@ def CancelFriendApply():
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="已撤销好友申请！").to_dict())
+
+
+# 获取好友亲密度列表（实际送到前段后排序）
+@friend_route.route('/get-intimacy-rank', methods=['GET'])
+@auth_token.login_required
+def GetIntimacyRank():
+    user_id = g.user_id
+    res = MySQL.getIntimacyRankList(user_id)
+    if res.status != 200:
+        return Error.error.to_dict()
+    return jsonify(Success(data=res.data, message="获取亲密度列表成功！").to_dict())
 

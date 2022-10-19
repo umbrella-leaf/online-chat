@@ -347,7 +347,8 @@ class MySQL:
             NotUserFriend = not_(User.user_id.in_(friend_id_list))
             IsAuthorized = User.status == UserState.authorized.value
             # 目标用户昵称空则匹配用户名，否则匹配昵称，并且不是当前用户并已通过验证，根据页码curPage与页大小pageSize分页查询
-            users_query = User.query.filter(and_(or_(and_(NickNameNone, UserNameMatch), NickNameMatch), NotUserFriend, IsAuthorized))
+            users_query = User.query.filter(
+                and_(or_(and_(NickNameNone, UserNameMatch), NickNameMatch), NotUserFriend, IsAuthorized))
             # 获取总数
             total = users_query.count()
             # 分页查询
@@ -526,5 +527,34 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
+    # 亲密度计算，格式化好友关系数据
+    @staticmethod
+    def formatFriendship(friendship: FriendShip):
+        message_cnt = friendship.message_cnt
+        start_time = friendship.start_time
+        # 亲密度 = 消息数 + 认识天数
+        start_from_now_day = (datetime.now() - start_time).days
+        return {
+            **friendship.to_dict(),
+            "intimacy": message_cnt + start_from_now_day
+        }
 
-
+    # 获取亲密度排行列表
+    @staticmethod
+    def getIntimacyRankList(user_id) -> Response:
+        try:
+            user = User.query.filter_by(user_id=user_id).first()
+            intimacy_rank_list = []
+            for friendship in user.friendships:
+                if friendship.status == FriendState.normal.value:
+                    intimacy_rank_list.append({**MySQL.formatFriendship(friendship),
+                                               "friend": MySQL.filterUserInfo(friendship.friend)})
+            for usership in user.userships:
+                if usership.status == FriendState.normal.value:
+                    intimacy_rank_list.append({**MySQL.formatFriendship(usership),
+                                               "friend": MySQL.filterUserInfo(usership.user)})
+            intimacy_rank_list.sort(key=lambda x: x["intimacy"], reverse=True)
+            return Success(data=intimacy_rank_list)
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
