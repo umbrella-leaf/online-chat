@@ -12,7 +12,7 @@ function IsSameWeek(timeBefore, timeAfter) {
   return timeBefore.isSameOrAfter(weekStart);
 }
 
-export function msgTimeFormat(time) {
+export function msgTimeFormat(time, chat_list=false) {
   const msg_time = dayjs(`${time}+8`);
   const now_time = dayjs();
   // 解析当前时间
@@ -37,22 +37,27 @@ export function msgTimeFormat(time) {
       } else if (days_interval === 1) {
         const hour = msg_time.hour();
         const dur = duration(hour);
-        return msg_time.format(`昨天 ${dur}h:mm`);
+        if (chat_list) return '昨天';
+        return msg_time.format(`昨天[&ensp;]${dur}h:mm`);
       } else if (IsSameWeek(msg_time, now_time)) {
         const week_str = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
         const msg_week = msg_time.day();
-        return msg_time.format(`${week_str[msg_week]} HH:mm`);
+        if (chat_list) return `${week_str[msg_week]}`;
+        return msg_time.format(`${week_str[msg_week]}[&ensp;]HH:mm`);
       } else {
         const hour = msg_time.hour();
         const dur = duration(hour);
-        return msg_time.format(`M月D日 ${dur}HH:mm`);
+        if (chat_list) return msg_time.format(`M月D日`);
+        return msg_time.format(`M月D日[&ensp;]${dur}HH:mm`);
       }
     } else {
       const hour = msg_time.hour();
       const dur = duration(hour);
-      return msg_time.format(`M月D日 ${dur}HH:mm`);
+      if (chat_list) return msg_time.format(`M月D日`);
+      return msg_time.format(`M月D日[&ensp;]${dur}HH:mm`);
     }
   } else {
-    return msg_time.format(`YYYY年M月D日 H:mm`)
+    if (chat_list) return msg_time.format(`YYYY年M月D日`);
+    return msg_time.format(`YYYY年M月D日[&ensp;]HH:mm`)
   }
 }
