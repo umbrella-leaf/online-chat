@@ -42,6 +42,7 @@ def handle_send(data):
     receiver_id = data["receiver_id"]
     emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{chat_id}')
     emit("updateChatList", {"sender_id": sender_id, "receiver_id": receiver_id}, broadcast=True)
+    emit("updateIntimacyRank", room=receiver_id)
 
 
 # 用户信息修改推送
@@ -53,6 +54,7 @@ def handle_modifyInfo(data):
     all_friends = MySQL.getAllFriendID(cur_id).data
     for normal_friend in normal_friends:
         emit("updateChatList", {"sender_id": cur_id, "receiver_id": normal_friend}, room=normal_friend)
+        emit("updateIntimacyRank", room=normal_friend)
     for normal_active_friend in normal_active_friends:
         emit("updateMessageList", {"force": True}, room=normal_active_friend)
     for friend in all_friends:
@@ -67,6 +69,8 @@ def handle_alterFriendship(data):
     cur_name = MySQL.getUserNameByID(cur_id).data
     # 推送好友列表更新
     emit("updateFriendList", room=receiver_id)
+    # 推送亲密度列表更新
+    emit("updateIntimacyRank", room=receiver_id)
     # 接受申请
     if data["type"] == "accept":
         emit("notice", {"notice": f'用户"{cur_name}"同意了您的好友申请！', "type": "success"}, room=receiver_id)
@@ -93,5 +97,11 @@ def handle_alterFriendship(data):
     # 拒绝申请
     if data["type"] == "refuse":
         emit("notice", {"notice": f'用户"{cur_name}"拒绝了您的好友申请！', "type": "warning"}, room=receiver_id)
+
+
+@socketio.on("leave_self", namespace="/chat")
+def handle_leave_self(data):
+    cur_id = data["cur_id"]
+    leave_room(cur_id)
 
 
