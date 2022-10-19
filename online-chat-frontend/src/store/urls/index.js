@@ -1,7 +1,7 @@
 export const urls = {
   namespaced: true,
   state: () => ({
-    icon_font_url: '//at.alicdn.com/t/c/font_3686980_wpy0y4xrox.js',
+    icon_font_url: '//at.alicdn.com/t/c/font_3686980_u16jda054a8.js',
     backend_url: 'http://localhost:5000',
     websocket_url: 'ws://localhost:5000'
   }),
