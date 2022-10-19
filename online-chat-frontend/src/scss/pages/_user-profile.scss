@@ -62,7 +62,43 @@
 		}
 	}
 	.intimacy-rank {
-
+		.ant-list {
+			height: 516px;
+			overflow-y: scroll;
+			.ant-list-item {
+				cursor: pointer;
+			}
+			.ant-list-item-meta-description {
+				span {
+					display: inline-block;
+					width: 150px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					vertical-align: middle;
+				}
+			}
+		}
+		.intimacy-right {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+			height: 49px;
+			span {
+				color: rgba(0, 0, 0, 0.6);
+			}
+			.message-cnt {
+				path {
+					fill: #1296db;
+				}
+			}
+			.intimacy-rate {
+				path {
+					fill: #d81e06;
+				}
+			}
+		}
 	}
 }
 // / Profile Page
