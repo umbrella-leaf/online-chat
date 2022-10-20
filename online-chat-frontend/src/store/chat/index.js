@@ -1,7 +1,8 @@
 export const chat = {
   namespaced: true,
   state: () => ({
-    chat_id: 0
+    chat_id: 0,
+    user_info: {}
   }),
   getters: {
 
@@ -12,6 +13,12 @@ export const chat = {
     },
     resetChatID(state) {
       state.chat_id = 0;
+    },
+    updateChatUserInfo(state, info) {
+      state.user_info = info;
+    },
+    resetChatUserInfo(state) {
+      state.user_info = {};
     }
   },
   actions: {
