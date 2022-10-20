@@ -104,12 +104,9 @@ GetChatList();
 const chat_id = computed(() => store.state.chat.chat_id);
 // 聊天者信息
 const ChatUserInfo = computed(() => {
-  const cur_chat =  ChatList.value.filter((item) => {
-    return item["chat"]?.id === chat_id.value;
-  });
-  if (cur_chat.length) return cur_chat[0]["friend"];
-  return {};
+  return store.state.chat.user_info;
 });
+
 
 // 刷新消息框和输入框状态
 const RefreshFrame = () => {
@@ -197,9 +194,9 @@ const final = () => {
   // 聊天窗口关闭/隐藏时退出聊天
   if (document.visibilityState === "hidden") {
     if (chat_id.value) {
-      chat_socket.emit("leave", {chat_id: chat_id.value});
       const url = `${store.state.urls.backend_url}/chat/close/${chat_id.value}`;
       navigator.sendBeacon(url);
+      chat_socket.emit("leave", {chat_id: chat_id.value});
     }
   }
   // 聊天窗口可见时加入聊天
@@ -209,13 +206,14 @@ const final = () => {
     }
   }
 }
+
 document.addEventListener('visibilitychange', final);
 onUnmounted(() => {
-  document.removeEventListener("visibilitychange", final);
   chat_socket.off("updateMessageList");
   chat_socket.off("updateChatList");
   chat_socket.off("out_of_chat");
   clearInterval(updateDataWhenZeroClock);
+  document.removeEventListener("visibilitychange", final);
 })
 
 </script>
