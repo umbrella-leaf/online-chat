@@ -1,10 +1,10 @@
 <template>
   <div class="input">
-    <div class="emoji">
-      <div class="operations" style="width: 11%;">
+    <div class="emoji-blank">
+      <EmojiPicker>
         <FontIcons type="icon-emotion-line" />
-        <FontIcons type="icon-search" />
-      </div>
+      </EmojiPicker>
+      <FontIcons type="icon-search" />
     </div>
     <a-textarea ref="textarea" v-model:value="content" @keyup="onKeyup" placeholder="输入信息，按enter发送"></a-textarea>
     <div class="send" @click="send">
@@ -26,6 +26,7 @@ import {useStore} from "vuex";
 import {apiSendNewMessage} from "@/apis/chat/send-new-message";
 import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
 import {chat_socket} from "@/utils/WebSocket";
+import EmojiPicker from "@/components/Widgets/ChatRoom/InputFrame/EmojiPicker";
 
 
 const store = useStore();
@@ -100,9 +101,14 @@ Bus.$on('InputFocus', textarea_focus);
 Bus.$on('ClearInput', () => {
   content.value = '';
 })
+// 添加表情事件
+Bus.$on('InsertDefaultEmoji', (emoji) => {
+  content.value += emoji;
+})
 onUnmounted(() => {
   Bus.$off('InputFocus');
   Bus.$off('ClearInput');
+  Bus.$off('InsertDefaultEmoji');
 })
 
 </script>
