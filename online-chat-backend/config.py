@@ -1,4 +1,4 @@
-SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:Pvzheroes125@localhost:3306/chat_db"
+SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:Pvzheroes125@localhost:3306/chat_db?charset=utf8mb4"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_RECORD_QUERIES = True
 # SQLALCHEMY_ECHO = True
