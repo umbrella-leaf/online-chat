@@ -3,7 +3,8 @@
     <div>
       <a-card class="entrance-card" :tab-list="tabList" @tabChange="onTabChange" :active-tab-key="ActiveTabKey">
         <template #title>
-          <p class="title">Online Chat System</p>
+          <p class="title">Online Chat System<sup>®</sup></p>
+          <div style="font-size: 12px;font-weight: lighter;text-align: center;">(请在谷歌Chrome浏览器下访问)</div>
         </template>
         <router-view />
       </a-card>
