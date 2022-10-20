@@ -16,13 +16,16 @@ router.beforeEach((to, from, next) => {
                 store.commit("chat/updateChatID" ,parseInt(to.fullPath.match(/\d+/g)[0]));
             }
             else {
-                store.commit("chat/updateChatID", 0);
+                store.commit("chat/resetChatID");
+                store.commit("chat/resetChatUserInfo");
             }
         } else {
-            store.commit("chat/updateChatID", 0);
+            store.commit("chat/resetChatID");
+            store.commit("chat/resetChatUserInfo");
         }
     } else {
-        store.commit("chat/updateChatID", 0);
+        store.commit("chat/resetChatID");
+        store.commit("chat/resetChatUserInfo");
     }
     next();
 })
