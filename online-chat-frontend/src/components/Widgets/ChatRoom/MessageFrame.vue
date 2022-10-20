@@ -8,7 +8,7 @@
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
             <span v-if="IsSelfSend(item)" class="unread">{{ IsRead(item) ? "已读" : "未读" }}</span>
             <div class="content">
-              <div class="text">{{ item.content }}</div>
+              <div class="text" v-html="emojiParse(item.content)"></div>
             </div>
           </div>
         </li>
@@ -22,6 +22,7 @@ import {computed, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {useStore} from "vuex";
 import {msgTimeShowFilter} from "@/utils/time/msgTimeShowFilter";
+import {emojiParse} from "@/utils/emojis/emojiParse";
 
 
 const store = useStore();

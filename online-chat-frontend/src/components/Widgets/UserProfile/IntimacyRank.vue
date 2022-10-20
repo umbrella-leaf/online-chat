@@ -10,34 +10,17 @@
       <a-list :data-source="IntimacyRankList">
         <template #renderItem="{ item }">
           <a-list-item :key="item.id">
-            <a-popover>
-              <template #content>
-                <a-card style="width: 200px;">
-                  <a-card-meta>
-                    <template #avatar>
-                      <a-avatar shape="circle" :src="item['friend']?.avatar_url" />
-                    </template>
-                    <template #title>
-                      <span>{{ DisplayName(item) }}</span>
-                    </template>
-                  </a-card-meta>
-                  <template #actions>
-                    <span>{{ `你们已经认识${RecognizedTime(item)}了` }}</span>
-                  </template>
-                </a-card>
+            <a-list-item-meta>
+              <template #title>
+                <span>{{ DisplayName(item) }}</span>
               </template>
-              <a-list-item-meta>
-                <template #title>
-                  <span>{{ DisplayName(item) }}</span>
-                </template>
-                <template #avatar>
-                  <a-avatar shape="circle" :src='item["friend"]?.avatar_url' />
-                </template>
-                <template #description>
-                  <span>{{ item["friend"]?.signature }}</span>
-                </template>
-              </a-list-item-meta>
-            </a-popover>
+              <template #avatar>
+                <a-avatar shape="circle" :src='item["friend"]?.avatar_url' />
+              </template>
+              <template #description>
+                <span>{{ `你们已经认识${RecognizedTime(item)}了` }}</span>
+              </template>
+            </a-list-item-meta>
             <template #actions>
               <div class="intimacy-right">
                 <svg t="1664800243743" class="message-cnt" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1651" width="25" height="25">

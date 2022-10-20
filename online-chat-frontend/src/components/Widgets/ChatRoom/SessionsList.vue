@@ -14,39 +14,22 @@
       <a-list bordered item-layout="horizontal" :data-source="FilterChatList" class="search-result" v-else>
         <template #renderItem="{item}">
           <a-list-item @click="JumpIntoChat(item)" :class="{'chat-selected': ChatSelected(item)}" :key="ChatID(item)">
-            <a-popover>
-              <template #content>
-                <a-card style="width: 250px;">
-                  <a-card-meta>
-                    <template #title>{{ DisplayName(item) }}</template>
-                    <template #avatar>
-                      <a-avatar :src="AvatarUrl(item)" />
-                    </template>
-                  </a-card-meta>
-                  <a-descriptions :column="1">
-                    <a-descriptions-item label="手机号">{{ Telephone(item) }}</a-descriptions-item>
-                    <a-descriptions-item label="邮箱">{{ Email(item) }}</a-descriptions-item>
-                    <a-descriptions-item label="签名">{{ Signature(item) }}</a-descriptions-item>
-                  </a-descriptions>
-                </a-card>
+            <a-list-item-meta>
+              <template #avatar>
+                <a-badge v-if="!LatestMsgUnread(item)" count="✔" :number-style="{ backgroundColor: '#52c41a' }">
+                  <a-avatar :src="AvatarUrl(item)" />
+                </a-badge>
+                <a-badge v-else :count="UnreadMsgCount(item)">
+                  <a-avatar :src="AvatarUrl(item)" />
+                </a-badge>
               </template>
-              <a-list-item-meta>
-                <template #avatar>
-                  <a-badge v-if="!LatestMsgUnread(item)" count="✔" :number-style="{ backgroundColor: '#52c41a' }">
-                    <a-avatar :src="AvatarUrl(item)" />
-                  </a-badge>
-                  <a-badge v-else :count="UnreadMsgCount(item)">
-                    <a-avatar :src="AvatarUrl(item)" />
-                  </a-badge>
-                </template>
-                <template #title>
-                  <span>{{ DisplayName(item) }}</span>
-                </template>
-                <template #description>
-                  <span>{{ LatestMsgContent(item) }}</span>
-                </template>
-              </a-list-item-meta>
-            </a-popover>
+              <template #title>
+                <span>{{ DisplayName(item) }}</span>
+              </template>
+              <template #description>
+                <span>{{ LatestMsgContent(item) }}</span>
+              </template>
+            </a-list-item-meta>
             <template #actions>
               <span v-html="LatestMsgTime(item)"></span>
             </template>
@@ -130,6 +113,7 @@ const Signature = (item) => {
 // 点击会话列表中的名字跳转进入对应聊天室
 const JumpIntoChat = (item) => {
   router.push(`/chat-room/${item.chat?.id}`);
+  store.commit("chat/updateChatUserInfo", item["friend"]);
 }
 // 选中的聊天颜色样式
 const ChatSelected = (item) => {

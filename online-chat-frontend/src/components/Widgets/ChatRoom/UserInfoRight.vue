@@ -7,8 +7,24 @@
       <template #title>
         {{ DisplayName }}
         <div class="userinfo-right">
-          <FontIcons type="icon--MaleUser" />
-          <FontIcons type="icon-index" />
+          <a-popover v-if="ChatUserInfo['id']">
+            <template #content>
+              <a-card style="width: 250px;">
+                <a-card-meta>
+                  <template #title>{{ DisplayName }}</template>
+                  <template #avatar>
+                    <a-avatar :src="ChatUserInfo['avatar_url']" />
+                  </template>
+                </a-card-meta>
+                <a-descriptions :column="1">
+                  <a-descriptions-item label="手机号">{{ ChatUserInfo['telephone'] }}</a-descriptions-item>
+                  <a-descriptions-item label="邮箱">{{ ChatUserInfo['email'] }}</a-descriptions-item>
+                  <a-descriptions-item label="签名">{{ ChatUserInfo['signature'] }}</a-descriptions-item>
+                </a-descriptions>
+              </a-card>
+            </template>
+            <FontIcons type="icon--MaleUser" style="cursor: pointer;"/>
+          </a-popover>
         </div>
       </template>
       <template #description>
