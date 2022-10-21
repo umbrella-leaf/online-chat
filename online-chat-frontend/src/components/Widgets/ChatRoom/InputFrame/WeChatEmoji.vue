@@ -1,8 +1,8 @@
 <template>
   <ul class="emojiBox">
-    <template v-for="(item, index) in Object.keys(EmojiMap)" :key="EmojiMap[item]">
+    <template v-for="item in Object.keys(EmojiMap)" :key="EmojiMap[item]">
       <li>
-        <img :src="emotion_src(index)"  alt="" class="emoji" @click="insertEmotion(item)"/>
+        <img :src="emotion_src(item)"  alt="" class="emoji" @click="insertEmotion(item)"/>
       </li>
     </template>
   </ul>
@@ -18,12 +18,15 @@ const props = defineProps({
   }
 })
 
-const emotion_src = (index) => {
+const emotion_src = (item) => {
+  const name = props.EmojiMap[item];
+  const index = name.match(/\d+/g)[0];
   return `https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/${index}.gif`;
 };
 const insertEmotion = (item) => {
   Bus.$emit('InsertDefaultEmoji',`[${item}]`);
   Bus.$emit('InputFocus');
+  Bus.$emit('ChangePickerVisible', false);
 }
 
 </script>
