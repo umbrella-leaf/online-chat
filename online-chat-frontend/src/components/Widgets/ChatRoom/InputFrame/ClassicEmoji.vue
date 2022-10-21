@@ -1,6 +1,6 @@
 <template>
   <ul class="emojiBox">
-    <template v-for="(item, index) in Object.keys(EmojiMap)" :key="EmojiMap[item]">
+    <template v-for="item in Object.keys(EmojiMap)" :key="EmojiMap[item]">
       <li>
         <span class="emoji" @click="insertEmotion(item)">{{ item }}</span>
       </li>
@@ -21,6 +21,7 @@ const props = defineProps({
 const insertEmotion = (item) => {
   Bus.$emit('InsertDefaultEmoji',item);
   Bus.$emit('InputFocus');
+  Bus.$emit('ChangePickerVisible', false);
 }
 </script>
 
