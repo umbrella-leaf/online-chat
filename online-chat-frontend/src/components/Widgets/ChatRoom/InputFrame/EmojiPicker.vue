@@ -1,14 +1,12 @@
 <template>
-  <a-popover trigger="click" overlayClassName="emoji-popover">
+  <a-popover trigger="click" overlayClassName="emoji-popover" v-model:visible="visible">
     <template #content>
       <component :is="curEmojis.component" :EmojiMap="curEmojis.map" />
       <a-divider />
       <div class="options">
-        <div class="operations" style="width: 100%;">
-          <template v-for="item in emojiOptions" :key="item.name">
-            <span v-html="item.show" class="option" @click="selectEmojis(item)" :class="{selected: isEmojisSelected(item)}"/>
-          </template>
-        </div>
+        <template v-for="item in emojiOptions" :key="item.name">
+          <span v-html="item.show" class="option" @click="selectEmojis(item)" :class="{selected: isEmojisSelected(item)}"/>
+        </template>
       </div>
     </template>
     <slot />
@@ -16,24 +14,31 @@
 </template>
 
 <script setup>
-import {defaultEmojisMap1, defaultEmojisMap2} from "@/utils/emojis/default";
-import DefaultEmoji1 from "@/components/Widgets/ChatRoom/InputFrame/DefaultEmoji1";
-import DefaultEmoji2 from "@/components/Widgets/ChatRoom/InputFrame/DefaultEmoji2";
-import {ref, shallowRef} from "vue";
-
+import {WeChatEmojisMap, ClassicEmojisMap, QQEmojisMap} from "@/utils/emojis/default";
+import WeChatEmojis from "@/components/Widgets/ChatRoom/InputFrame/WeChatEmoji";
+import ClassicEmojis from "@/components/Widgets/ChatRoom/InputFrame/ClassicEmoji";
+import QQEmojis from "@/components/Widgets/ChatRoom/InputFrame/QQEmoji";
+import {onUnmounted, ref, shallowRef} from "vue";
+import Bus from "@/utils/EventBus";
 
 const emojiOptions = [
   {
-    name: "default1",
-    component: shallowRef(DefaultEmoji1),
-    map: defaultEmojisMap1,
+    name: "WeChatEmojis",
+    component: shallowRef(WeChatEmojis),
+    map: WeChatEmojisMap,
     show: `<img src="https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/13.gif"/>`
   },
   {
-    name: "default2",
-    component: shallowRef(DefaultEmoji2),
-    map: defaultEmojisMap2,
+    name: "ClassicEmojis",
+    component: shallowRef(ClassicEmojis),
+    map: ClassicEmojisMap,
     show: `<span>😁</span>`
+  },
+  {
+    name: "QQEmojis",
+    component: shallowRef(QQEmojis),
+    map: QQEmojisMap,
+    show: `<img src="https://www.emojiall.com/img/platform/qq/004@2x.gif"/>`
   }
 ];
 // 当前表情集
@@ -48,6 +53,15 @@ const isEmojisSelected = (item) => {
 }
 
 
+// 表情选择框可见
+const visible = ref(false);
+Bus.$on("ChangePickerVisible", (value) => {
+  visible.value = value;
+})
+
+onUnmounted(() => {
+  Bus.$off("ChangePickerVisible");
+})
 
 </script>
 
