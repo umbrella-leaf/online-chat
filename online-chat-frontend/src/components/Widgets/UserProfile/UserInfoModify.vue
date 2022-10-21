@@ -26,13 +26,13 @@
         <a-input-search readOnly v-model:value="FormState.nickname" v-show="!NickNameEditing"
                         @search="changeEditStatus('nickname', true)">
           <template #enterButton>
-            <a-button type="primary"><template #icon><EditFilled /></template></a-button>
+            <a-button type="primary" title="编辑昵称"><template #icon><EditFilled /></template></a-button>
           </template>
         </a-input-search>
         <a-input-search v-model:value="FormState.nickname" v-show="NickNameEditing" ref="nickname"
                         @search="changeEditStatus('nickname', false)">
           <template #enterButton>
-            <a-button type="primary" danger><template #icon><EditFilled /></template></a-button>
+            <a-button type="primary" danger title="取消编辑"><template #icon><EditFilled /></template></a-button>
           </template>
         </a-input-search>
       </a-form-item>
@@ -43,24 +43,24 @@
         <a-input-search readOnly v-model:value="FormState.signature" v-show="!SignatureEditing"
                         @search="changeEditStatus('sign', true)">
           <template #enterButton>
-            <a-button type="primary"><template #icon><EditFilled /></template></a-button>
+            <a-button type="primary" title="编辑签名"><template #icon><EditFilled /></template></a-button>
           </template>
         </a-input-search>
         <a-input-search v-model:value="FormState.signature" v-show="SignatureEditing" ref="signature"
                         @search="changeEditStatus('sign', false)">
           <template #enterButton>
-            <a-button type="primary" danger><template #icon><EditOutlined /></template></a-button>
+            <a-button type="primary" danger title="取消编辑"><template #icon><EditOutlined /></template></a-button>
           </template>
         </a-input-search>
       </a-form-item>
       <a-form-item :wrapper-col="{offset:3, span: 18}" class="submit-item">
-        <a-button type="primary" @click="ChangeInfo" :disabled="!InfoChanged">
+        <a-button type="primary" @click="ChangeInfo" :disabled="!InfoChanged" title="保存修改">
           <template #icon>
             <FormOutlined />
           </template>
           保存
         </a-button>
-        <a-button type="danger" @click="ResetInfo">
+        <a-button type="danger" @click="ResetInfo" title="重置修改">
           <template #icon><DeleteOutlined /></template>
           重置
         </a-button>

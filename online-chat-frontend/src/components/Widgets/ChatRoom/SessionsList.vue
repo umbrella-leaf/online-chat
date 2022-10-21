@@ -27,7 +27,7 @@
                 <span>{{ DisplayName(item) }}</span>
               </template>
               <template #description>
-                <span>{{ LatestMsgContent(item) }}</span>
+                <span v-html="LatestMsgContent(item)" />
               </template>
             </a-list-item-meta>
             <template #actions>
@@ -45,6 +45,7 @@ import {useStore} from "vuex";
 import {useRouter, useRoute} from "vue-router";
 import {computed} from "vue";
 import {msgTimeFormat} from "@/utils/time/msgTimeFormat";
+import {emojiParse} from "@/utils/emojis/emojiParse";
 
 
 const store = useStore();
@@ -80,7 +81,7 @@ const ChatID = (item) => {
 }
 // 最新消息内容
 const LatestMsgContent = (item) => {
-  return item["latest_msg"]?.content
+  return emojiParse(item["latest_msg"]?.content);
 }
 // 最新消息时间
 const LatestMsgTime = (item) => {

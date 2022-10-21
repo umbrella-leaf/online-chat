@@ -1,10 +1,12 @@
 <template>
   <div class="input">
     <div class="emoji-blank">
-      <EmojiPicker>
-        <FontIcons type="icon-emotion-line" />
-      </EmojiPicker>
-      <FontIcons type="icon-search" />
+      <keep-alive>
+        <EmojiPicker>
+          <FontIcons type="icon-emotion-line" title="表情"/>
+        </EmojiPicker>
+      </keep-alive>
+      <FontIcons type="icon-search" title="搜索聊天记录"/>
     </div>
     <a-textarea ref="textarea" v-model:value="content" @keyup="onKeyup" placeholder="输入信息，按enter发送"></a-textarea>
     <div class="send" @click="send">
