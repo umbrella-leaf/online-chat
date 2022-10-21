@@ -135,6 +135,10 @@
             color: $color-gray-7;
             font-size: 14px;
             //font-weight: $fw-semibold;
+            img {
+              width: 24px;
+              height: 24px;
+            }
             span {
               display: inline-block;
               width: 200px;
@@ -281,6 +285,10 @@
             word-break: break-all;
             background-color: #fafafa;
             border-radius: 4px;
+            img {
+              width: 24px;
+              height: 24px;
+            }
             &:before {
               content: " ";
               position: absolute;
@@ -461,24 +469,28 @@
     font-size: 12px;
     box-sizing: border-box;
     color: #7c7c7c;
-    .operations {
+    display: flex;
+    .option {
+      box-sizing: content-box;
+      width: 25px;
+      height: 25px;
       display: flex;
-      .option {
-        box-sizing: content-box;
-        width: 25px;
-        height: 25px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        font-size: 19px;
-        padding: 5px;
-        &:hover {
-          background-color: #ededed;
-        }
-        &.selected {
-          background-color: #c0c0c0;
-        }
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 19px;
+      padding: 5px;
+      margin-right: 10px;
+      border-radius: 5px;
+      img {
+        width: 24px;
+        height: 24px;
+      }
+      &:hover {
+        background-color: #ededed;
+      }
+      &.selected {
+        background-color: #c0c0c0;
       }
     }
   }
