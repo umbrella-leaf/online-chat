@@ -23,7 +23,7 @@
 <script setup>
 
 // 关键字
-import {computed, nextTick, onUnmounted, ref} from "vue";
+import {computed, onUnmounted, ref} from "vue";
 import {apiSearchUser} from "@/apis/user/search-user";
 import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import {apiAddFriend} from "@/apis/friend/add-friend";
@@ -64,9 +64,7 @@ const SearchUsers = (search_source) => {
         }
         // 若不是添加好友引起的获取列表，就将滚动条移动到最上
         if (!search_source.add) {
-          nextTick(() => {
-            Bus.$emit('resultDisplayToTop');
-          })
+          Bus.$emit('resultDisplayToTop');
         }
       } else {
         SearchResults.value = [];

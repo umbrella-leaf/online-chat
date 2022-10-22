@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import {computed, onUnmounted, ref} from "vue";
+import {computed, nextTick, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 
 
@@ -103,7 +103,7 @@ const search_results = ref();
 // 按钮搜索时滚动条到最上
 Bus.$on('resultDisplayToTop', () => {
   // console.log(search_results.value);
-  search_results.value.scrollTop = 0;
+  nextTick(() => {search_results.value.scrollTop = 0;})
 })
 // 页面销毁时卸载
 onUnmounted(() => {

@@ -26,9 +26,9 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from "vue";
+import {computed, onUnmounted, ref, watch} from "vue";
 import {useStore} from "vuex";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import Bus from "@/utils/EventBus";
 import {chat_socket} from "@/utils/WebSocket";
 import MessageFrame from '../components/Widgets/ChatRoom/MessageFrame';
@@ -123,12 +123,12 @@ const GetMessageList = (chat_id) => {
       if (response.data.status === 200) {
         MessageList.value = response.data.data;
       }
-      nextTick(() => {RefreshFrame();});
+      RefreshFrame();
     })
     .catch(error => {
       console.log(error);
       ReportErrorMessage(error);
-      nextTick(() => {RefreshFrame();});
+      RefreshFrame();
     })
 }
 

@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import {computed, onUnmounted, ref} from "vue";
+import {computed, nextTick, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {useStore} from "vuex";
 import {msgTimeShowFilter} from "@/utils/time/msgTimeShowFilter";
@@ -74,7 +74,7 @@ const downloadImage = (fileUrl) => {
 const msg_list = ref();
 // 消息框拉到底
 const msg_list_to_bottom = () => {
-  msg_list.value.scrollTop = msg_list.value.scrollHeight;
+  nextTick(() => {msg_list.value.scrollTop = msg_list.value.scrollHeight;})
 }
 Bus.$on('MessageToBottom', msg_list_to_bottom);
 onUnmounted(() => {
