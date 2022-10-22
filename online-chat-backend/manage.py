@@ -8,6 +8,7 @@ from entrance.view import entrance_route
 from user.view import user_route
 from friend.view import friend_route
 from chat.view import chat_route
+from emoji.view import emoji_route
 import chat.socket
 import config
 import re
@@ -23,6 +24,7 @@ app.register_blueprint(entrance_route, url_prefix='/')
 app.register_blueprint(friend_route, url_prefix='/friend')
 app.register_blueprint(user_route, url_prefix='/user')
 app.register_blueprint(chat_route, url_prefix='/chat')
+app.register_blueprint(emoji_route, url_prefix='/emoji')
 # 初始化CORS跨域模块
 CORS(app, supports_credentials=True)
 # 为app绑定webSocket
