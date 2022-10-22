@@ -277,10 +277,10 @@
             display: inline-block;
             margin-left: 10px;
             position: relative;
-            padding: 6px 10px;
+            padding: 5px 10px;
             max-width: 350px;
             min-height: 36px;
-            line-height: 24px;
+            line-height: 26px;
             box-sizing: border-box;
             font-size: 14px;
             text-align: left;
@@ -366,7 +366,7 @@
           height: 20px;
         }
       }
-      textarea {
+      .textarea {
         box-sizing: border-box;
         padding: 0 30px;
         height: 70px;
@@ -376,6 +376,14 @@
         resize: none;
         font-family: 'Microsoft YaHei UI', serif;
         font-weight: 400;
+        &.review {
+          white-space: pre-wrap;
+          overflow-y: auto;
+          img {
+            width: 24px;
+            height: 24px;
+          }
+        }
       }
       .input-btn {
         cursor: pointer;
@@ -393,13 +401,24 @@
         color: #7c7c7c;
         &.send {
           right: 30px;
+          &:hover {
+            background: rgb(18,150,17);
+            color: #fff;
+          }
         }
         &.review {
           right: 120px;
+          &:hover {
+            background: rgb(18,150,17);
+            color: #fff;
+          }
         }
-        &:hover {
-          background: rgb(18,150,17);
-          color: #fff;
+        &.edit {
+          right: 120px;
+          &:hover {
+            background: rgb(150, 17, 37);
+            color: #fff;
+          }
         }
       }
       .warn {
