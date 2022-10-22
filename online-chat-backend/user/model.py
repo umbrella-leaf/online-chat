@@ -13,7 +13,7 @@ class User(db.Model):
     email = db.Column(db.String(64), nullable=False)
     nickname = db.Column(db.String(255))
     avatar_url = db.Column(db.String(255), nullable=False,
-                           server_default="http://image.umbrella-leaf.com/avatar/default.png")
+                           server_default="http://image.umbrella-leaf.com/online-chat/avatar/default.png")
     signature = db.Column(db.String(255), nullable=False, server_default="一段有个性的签名")
     status = db.Column(db.Integer, nullable=False, server_default=text(str(UserState.unauthorized.value)))
     register_time = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
