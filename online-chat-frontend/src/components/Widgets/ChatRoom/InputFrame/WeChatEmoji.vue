@@ -23,8 +23,11 @@ const emotion_src = (item) => {
   const index = name.match(/\d+/g)[0];
   return `https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/${index}.gif`;
 };
+const emoji_url = (item) => {
+  return `<img src='${emotion_src(item)}'  alt=""/>`
+}
 const insertEmotion = (item) => {
-  Bus.$emit('InsertDefaultEmoji',`[${item}]`);
+  Bus.$emit('InsertDefaultEmoji',emoji_url(item));
   Bus.$emit('InputFocus');
   Bus.$emit('ChangePickerVisible', false);
 }

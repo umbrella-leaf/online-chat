@@ -39,7 +39,10 @@ const showEmojiUploader = () => {
 
 // 发送用户表情
 const SendUserEmoji = (emoji) => {
-  Bus.$emit('SendUserEmoji', emoji.url);
+  const content = "[图片表情]";
+  const html = emoji.url;
+  // 发送用户表情
+  Bus.$emit('SendUserEmoji', {content, html});
   // 关闭表情选择框
   Bus.$emit('ChangePickerVisible', false);
 }

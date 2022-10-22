@@ -8,18 +8,18 @@
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
             <span v-if="IsSelfSend(item)" class="unread">{{ IsRead(item) ? "已读" : "未读" }}</span>
             <div class="content" v-if="item.type === 0">
-              <div class="text" v-html="emojiParse(item.content)"></div>
+              <div class="text" v-html="item.html"></div>
             </div>
             <a-dropdown :trigger="['contextmenu']" v-else >
               <template #overlay>
                 <a-menu>
-                  <a-menu-item @click="downloadImage(item.content)">
+                  <a-menu-item @click="downloadImage(item.html)">
                     <DownloadOutlined />
                     保存到本地
                   </a-menu-item>
                 </a-menu>
               </template>
-              <img :src="item.content" alt="" class="emoji"/>
+              <img :src="item.html" alt="" class="emoji"/>
             </a-dropdown>
           </div>
         </li>
@@ -33,7 +33,6 @@ import {computed, nextTick, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {useStore} from "vuex";
 import {msgTimeShowFilter} from "@/utils/time/msgTimeShowFilter";
-import {emojiParse} from "@/utils/emojis/emojiParse";
 import {DownloadOutlined} from "@ant-design/icons-vue";
 import {downloadFile} from "@/utils/emojis/download";
 

@@ -8,16 +8,7 @@
       </keep-alive>
       <FontIcons type="icon-search" title="搜索聊天记录"/>
     </div>
-    <a-textarea ref="textarea" v-model:value="content" class="textarea"
-                @keydown="onKeyDown" placeholder="输入信息，按enter发送，按shift+enter换行"
-                v-show="MsgReviewing === false"/>
-    <div v-show="MsgReviewing === true" class="textarea review" v-html="emojiParse(content)"/>
-    <div class="input-btn review" v-if="MsgReviewing === false" @click="review" title="预览发送内容, 预览状态下无法按enter发送">
-      <span>预览</span>
-    </div>
-    <div class="input-btn edit" v-else @click="edit"  title="回到编辑状态">
-      <span>编辑</span>
-    </div>
+    <ContentEditor class="textarea"/>
     <div class="input-btn send" @click="send" title="按enter键发送，按shift+enter换行">
       <span>发送（S）</span>
     </div>
@@ -38,7 +29,7 @@ import {apiSendNewMessage} from "@/apis/chat/send-new-message";
 import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import {chat_socket} from "@/utils/WebSocket";
 import EmojiPicker from "@/components/Widgets/ChatRoom/InputFrame/EmojiPicker";
-import {emojiParse} from "@/utils/emojis/emojiParse";
+import ContentEditor from "@/components/Widgets/ChatRoom/InputFrame/ContentEditor";
 
 
 const store = useStore();
@@ -61,36 +52,13 @@ const chat_id = computed(() => store.state.chat.chat_id);
 const cur_id = computed(() => store.state.user.info.id);
 
 
-// 按回车发送
-// 按Shift+Enter换行
-const onKeyDown = (e) => {
-  if (e.shiftKey && e.keyCode === 13) {
-    return;
-  }
-  if (e.keyCode === 13) {
-    e.preventDefault();
-    send();
-  }
-}
-
-// 预览消息
-const MsgReviewing = ref(false);
-// 预览
-const review = () => {
-  MsgReviewing.value = true;
-}
-// 编辑（取消预览）
-const edit = () => {
-  MsgReviewing.value = false;
-  textarea_focus();
-}
-
 // 发送消息
-const SendNewMessage = (content, type=0) => {
+const SendNewMessage = (param, type=0) => {
   if (chat_id.value) {
     const params = {
       chat_id: chat_id.value,
-      content: content,
+      content: param.content,
+      html: param.html,
       sender_id: cur_id.value,
       type: type
     }
@@ -100,8 +68,6 @@ const SendNewMessage = (content, type=0) => {
         if (response.data.status === 200) {
           // 清空输入
           Bus.$emit('ClearInput');
-          // 恢复编辑
-          edit();
           // 推送消息
           chat_socket.emit("send", {chat_id: chat_id.value, sender_id: cur_id.value, receiver_id: props.ChatUserInfo.id});
         }
@@ -112,43 +78,35 @@ const SendNewMessage = (content, type=0) => {
       })
   }
 }
-const send = () => {
+const send = (param) => {
+  const { content, html } = param;
+  // 在聊天室内才发送
   if (chat_id.value) {
-    if (content.value.replace(/(^\s*)|(\s*$)/g, "").length === 0) {
+    // 如果消息为空（文本内容空且html消息无表情）
+    if (content.replace(/(^\s*)|(\s*$)/g, "").length === 0 && !html.includes("<img")) {
       warn.value = true;
-      content.value = '';
+      Bus.$emit('ClearInput');
       setTimeout(() => {
         warn.value = false;
       }, 1000)
     } else {
-      SendNewMessage(content.value);
+      SendNewMessage(param);
     }
   } else {
-    content.value = "";
+    Bus.$emit('ClearInput');
   }
 }
 
-
-const textarea = ref();
-const textarea_focus = () => {
-  nextTick(() => {textarea.value.focus();})
-}
-Bus.$on('InputFocus', textarea_focus);
-Bus.$on('ClearInput', () => {
-  content.value = '';
-})
-// 添加表情事件
-Bus.$on('InsertDefaultEmoji', (emoji) => {
-  content.value += emoji;
+// 发送文本消息
+Bus.$on('SendText', (param) => {
+  send(param);
 })
 // 发送消息事件（用于直接发送用户表情包）
-Bus.$on('SendUserEmoji', (emoji_url) => {
-  SendNewMessage(emoji_url, 1)
+Bus.$on('SendUserEmoji', (param) => {
+  SendNewMessage(param, 1)
 })
 onUnmounted(() => {
-  Bus.$off('InputFocus');
-  Bus.$off('ClearInput');
-  Bus.$off('InsertDefaultEmoji');
+  Bus.$off('SendText');
   Bus.$off('SendUserEmoji');
 })
 

@@ -40,7 +40,6 @@ import SessionsList from "@/components/Widgets/ChatRoom/SessionsList";
 import UserInfoRight from "@/components/Widgets/ChatRoom/UserInfoRight";
 import {apiGetChatList} from "@/apis/chat/get-chat-list";
 import {apiGetMessageList} from "@/apis/chat/get-message-list";
-import {apiSendNewMessage} from "@/apis/chat/send-new-message";
 
 
 const router = useRouter();
@@ -152,9 +151,7 @@ chat_socket.on("updateMessageList", (data) => {
 })
 // 收到聊天列表更新推送
 chat_socket.on("updateChatList", (data) => {
-  if (cur_id.value === data["receiver_id"] || cur_id.value === data["sender_id"]) {
-    GetChatList()
-  }
+  GetChatList();
 })
 // 强制退出聊天室
 chat_socket.on("out_of_chat", (data) => {
@@ -169,7 +166,7 @@ chat_socket.on("out_of_chat", (data) => {
 watch(() => chat_id.value, (newVal, oldVal) => {
   // 之前是聊天窗口，就离开
   if (oldVal) {
-    chat_socket.emit("leave", {chat_id: oldVal});
+    chat_socket.emit("leave", {cur_id: cur_id.value});
     const url = `${store.state.urls.backend_url}/chat/close/${oldVal}`;
     navigator.sendBeacon(url);
   }
@@ -189,14 +186,16 @@ const updateDataWhenZeroClock = setInterval(() => {
     }
   }, 1000);
 
-
+if (chat_id.value) {
+  GetMessageList(chat_id.value);
+}
 const final = () => {
   // 聊天窗口关闭/隐藏时退出聊天
   if (document.visibilityState === "hidden") {
     if (chat_id.value) {
       const url = `${store.state.urls.backend_url}/chat/close/${chat_id.value}`;
       navigator.sendBeacon(url);
-      chat_socket.emit("leave", {chat_id: chat_id.value});
+      chat_socket.emit("leave", {cur_id: cur_id.value});
     }
   }
   // 聊天窗口可见时加入聊天

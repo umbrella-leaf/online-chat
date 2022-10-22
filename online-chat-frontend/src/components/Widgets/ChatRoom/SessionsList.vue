@@ -27,8 +27,7 @@
                 <span>{{ DisplayName(item) }}</span>
               </template>
               <template #description>
-                <span v-html="LatestMsgContent(item)"  v-if="LatestMsgIsText(item)" class="message"/>
-                <span v-else>[动画表情]</span>
+                <span v-html="LatestMsgContent(item)" class="message"/>
               </template>
             </a-list-item-meta>
             <template #actions>
@@ -79,10 +78,6 @@ const DisplayName = (item) => {
 // 聊天室ID
 const ChatID = (item) => {
   return item["chat"]?.id;
-}
-// 最新消息是文本内容（非用户表情）
-const LatestMsgIsText = (item) => {
-  return item["latest_msg"]?.type === 0;
 }
 // 最新消息内容
 const LatestMsgContent = (item) => {
