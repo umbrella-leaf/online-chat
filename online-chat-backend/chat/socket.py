@@ -24,9 +24,11 @@ def handle_join(data):
     if res.status != 200:
         emit("notice", {"notice": "加入聊天失败！", "type": "error"}, room=sender_id)
         return
-    join_room(room=f'chat_{chat_id}')
-    emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{chat_id}')
-    emit("updateChatList", {"sender_id": sender_id, "receiver_id": receiver_id}, broadcast=True)
+    join_room(room=f'chat_{sender_id}')
+    emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{receiver_id}')
+    emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{sender_id}')
+    emit("updateChatList", room=f'chat_{sender_id}')
+    # emit("updateChatList", room=f'chat_{receiver_id}')
 
 
 # 加入个人房间
@@ -39,8 +41,8 @@ def handle_join_self(data):
 # 离开聊天房间
 @socketio.on("leave", namespace="/chat")
 def handle_leave(data):
-    chat_id = data["chat_id"]
-    leave_room(room=f'chat_{chat_id}')
+    cur_id = data["cur_id"]
+    leave_room(room=f'chat_{cur_id}')
 
 
 # 消息发送推送
@@ -49,8 +51,10 @@ def handle_send(data):
     chat_id = data["chat_id"]
     sender_id = data["sender_id"]
     receiver_id = data["receiver_id"]
-    emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{chat_id}')
-    emit("updateChatList", {"sender_id": sender_id, "receiver_id": receiver_id}, broadcast=True)
+    emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{receiver_id}')
+    emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{sender_id}')
+    emit("updateChatList", room=receiver_id)
+    emit("updateChatList", room=sender_id)
     emit("updateIntimacyRank", room=receiver_id)
 
 
@@ -62,10 +66,10 @@ def handle_modifyInfo(data):
     normal_active_friends = MySQL.getAllFriendID(cur_id, normal=True, active=True).data
     all_friends = MySQL.getAllFriendID(cur_id).data
     for normal_friend in normal_friends:
-        emit("updateChatList", {"sender_id": cur_id, "receiver_id": normal_friend}, room=normal_friend)
+        emit("updateChatList", room=normal_friend)
         emit("updateIntimacyRank", room=normal_friend)
     for normal_active_friend in normal_active_friends:
-        emit("updateMessageList", {"force": True}, room=normal_active_friend)
+        emit("updateMessageList", {"force": True}, room=f'chat_{normal_active_friend}')
     for friend in all_friends:
         emit("updateFriendList", room=friend)
 
@@ -83,23 +87,23 @@ def handle_alterFriendship(data):
     # 接受申请
     if data["type"] == "accept":
         emit("notice", {"notice": f'用户"{cur_name}"同意了您的好友申请！', "type": "success"}, room=receiver_id)
-        emit("updateChatList", {"sender_id": cur_id, "receiver_id": receiver_id}, room=receiver_id)
+        emit("updateChatList", room=receiver_id)
     # 解除屏蔽
     if data["type"] == "white":
-        emit("updateChatList", {"sender_id": cur_id, "receiver_id": receiver_id}, room=receiver_id)
+        emit("updateChatList", room=receiver_id)
     # 屏蔽
     if data["type"] == "black":
         friendship_id = data["friendship_id"]
         chat_id = MySQL.getChatIDByFriendShipID(friendship_id).data
         emit("out_of_chat", {"chat_id": chat_id}, room=receiver_id)
         emit("notice", {"notice": f'您被好友"{cur_name}"屏蔽！', "type": "warning"}, room=receiver_id)
-        emit("updateChatList", {"sender_id": cur_id, "receiver_id": receiver_id}, room=receiver_id)
+        emit("updateChatList", room=receiver_id)
     # 删除
     if data["type"] == "delete":
         chat_id = data["chat_id"]
         emit("out_of_chat", {"chat_id": chat_id}, room=receiver_id)
         emit("notice", {"notice": f'您被好友"{cur_name}"删除！', "type": "error"}, room=receiver_id)
-        emit("updateChatList", {"sender_id": cur_id, "receiver_id": receiver_id}, room=receiver_id)
+        emit("updateChatList", room=receiver_id)
     # 发出申请
     if data["type"] == "apply":
         emit("notice", {"notice": f'您收到用户"{cur_name}"的好友申请！', "type": "success"}, room=receiver_id)
