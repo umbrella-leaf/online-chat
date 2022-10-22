@@ -4,11 +4,14 @@ from exts import db, cos
 from user.model import User
 from friend.model import FriendShip
 from chat.model import Chat, Message
+from emoji.model import Emoji
 from utils.Response import Response, Success, Error
 from utils.Enums import UserState, FriendState, MessageState
 from sqlalchemy import or_, and_, not_, func
 from time import time
 from datetime import datetime
+from utils.Logger import logger
+import re
 import pymysql
 
 
@@ -16,7 +19,8 @@ class MySQL:
     # 封装的报错函数
     @staticmethod
     def errOut(err):
-        print(f"数据库发生错误：{str(err)}")
+        # print(f"发生错误：{str(err)}")
+        logger.error(err, exc_info=True, stack_info=True)
 
     # 通过手机号+密码验证用户是否在数据库中
     @staticmethod
@@ -146,11 +150,16 @@ class MySQL:
         ext_begin = avatar_base64.find('/')
         ext_end = avatar_base64.find(";", ext_begin)
         ext = avatar_base64[ext_begin + 1:ext_end]
+        # 是base64则转换并上传
         if avatar_base64.find('base64') != -1:
-            avatar_name = f"/avatar/{telephone}/{telephone}.{ext}"
+            # 拼接文件路径
+            avatar_name = f"/online-chat/avatar/{telephone}/{telephone}.{ext}"
             b = base64.b64decode(avatar_base64[ext_end + 8:])
+            # 上传到cos
             cos.upload_object(b, avatar_name)
+            # 返回url
             avatar_url = f"{cos.get_object_url(avatar_name)}?timestamp={int(time())}"
+        # 否则按当前时间拼接url
         else:
             if avatar_base64.find('?') != -1:
                 avatar_url = f"{avatar_base64.split('?')[0]}?timestamp={int(time())}"
@@ -428,6 +437,7 @@ class MySQL:
             'time': message.send_time,
             'content': message.content,
             'status': message.status,
+            'type': message.type,
             'sender_id': message.sender_id,
             'sender_avatar': message.sender.avatar_url
         }
@@ -464,7 +474,7 @@ class MySQL:
 
     # 发送聊天消息
     @staticmethod
-    def sendNewMessage(chat_id, content, sender_id) -> Response:
+    def sendNewMessage(chat_id, content, sender_id, msg_type) -> Response:
         try:
             chat = Chat.query.filter_by(id=chat_id).first()
             online = chat.online
@@ -473,7 +483,7 @@ class MySQL:
                 status = MessageState.unread.value
             else:
                 status = MessageState.read.value
-            message = Message(chat_id=chat_id, content=content, sender_id=sender_id, status=status)
+            message = Message(chat_id=chat_id, content=content, sender_id=sender_id, status=status, type=msg_type)
             # 插入消息到Message表
             db.session.add(message)
             db.session.commit()
@@ -558,3 +568,49 @@ class MySQL:
         except Exception as e:
             MySQL.errOut(e)
             return Error()
+
+    # 获取表情包
+    @staticmethod
+    def getEmojiList(user_id) -> Response:
+        try:
+            user = User.query.filter_by(user_id=user_id).first()
+            emojis = [emoji.to_dict() for emoji in user.emojis]
+            emojis.sort(key=lambda x: x["id"], reverse=True)
+            return Success(data=emojis)
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
+
+    # 处理用户表情包图片base64地址
+    @staticmethod
+    def processEmojiUrl(user_id, emoji_base64, emoji_id):
+        # 处理base64地址得到后缀名
+        ext_begin = emoji_base64.find('/')
+        ext_end = emoji_base64.find(";", ext_begin)
+        ext = emoji_base64[ext_begin + 1:ext_end]
+        # 拼接获得表情包路径
+        emoji_name = f"/online-chat/emojis/user_{user_id}/emoji_{emoji_id}.{ext}"
+        b = base64.b64decode(emoji_base64[ext_end + 8:])
+        # 上传表情包
+        cos.upload_object(b, emoji_name)
+        # 获得返回url
+        emoji_url = f"{cos.get_object_url(emoji_name)}"
+        return emoji_url
+
+    # 添加用户表情包
+    @staticmethod
+    def addUserEmoji(user_id, emoji_base64):
+        try:
+            emoji_cnt = db.session.query(func.count(Emoji.id)).scalar()
+            emoji_url = MySQL.processEmojiUrl(user_id, emoji_base64, emoji_cnt + 1)
+            # 插入表情地址到数据库
+            emoji = Emoji(user_id=user_id, url=emoji_url)
+            db.session.add(emoji)
+            db.session.commit()
+            return Success()
+        except Exception as e:
+            db.session.rollback()
+            MySQL.errOut(e)
+            return Error()
+
+
