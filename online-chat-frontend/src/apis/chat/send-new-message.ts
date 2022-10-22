@@ -3,6 +3,7 @@ import httpRequest from '@/apis/index'
 interface SendNewMessageParam {
     chat_id: number,
     content: string,
+    html: string,
     sender_id: number,
     type: number
 }
