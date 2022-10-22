@@ -9,7 +9,7 @@
                   style="display: flex;justify-content: center;align-items: center;"
                   name="avatar"
                   list-type="picture-card"
-                  accept=".jpg,.png"
+                  accept=".jpg,.png,.jpeg"
                   :show-upload-list="false"
                   :before-upload="beforeUpload"
                   :custom-request="customUpload">
@@ -74,7 +74,7 @@ import {computed, nextTick, ref, watch} from "vue";
 import { FormOutlined, DeleteOutlined, EditOutlined, EditFilled } from "@ant-design/icons-vue";
 import {message} from "ant-design-vue";
 import {apiChangeInfo} from "@/apis/user/change-info";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import Bus from "@/utils/EventBus";
 import {chat_socket} from "@/utils/WebSocket";
 import {useStore} from "vuex";
@@ -205,12 +205,29 @@ const getChangedFormFields = () => {
 // 提交事件
 const ChangeInfo = () => {
   const params = getChangedFormFields();
+  if (FormState.value.nickname.length > 15) {
+    message.warning("昵称不得超过15字！");
+    nextTick(() => {nickname.value.focus();})
+    return;
+  }
+  if (FormState.value.signature.length === 0) {
+    message.warning("签名不得为空！");
+    nextTick(() => {signature.value.focus();})
+    return;
+  }
+  if (FormState.value.nickname.length > 30) {
+    message.warning("签名不得超过30字！");
+    nextTick(() => {signature.value.focus();})
+    return;
+  }
   apiChangeInfo(params)
     .then(response => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         Bus.$emit('updateUserInfo');
         chat_socket.emit("modifyInfo", {cur_id: cur_id.value});
+        changeEditStatus("nickname", false);
+        changeEditStatus("sign", false);
       }
     })
     .catch(error => {

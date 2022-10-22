@@ -47,7 +47,7 @@
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import {apiBlackFriend} from "@/apis/friend/black-friend";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import Bus from "@/utils/EventBus";
 import {apiWhiteFriend} from "@/apis/friend/white-friend";
 import {apiDeleteFriend} from "@/apis/friend/delete-friend";

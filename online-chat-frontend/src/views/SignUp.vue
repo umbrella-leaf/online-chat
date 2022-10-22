@@ -83,7 +83,7 @@ import md5 from "js-md5";
 import {apiSignUp} from "@/apis/entrance/sign-up";
 import {apiSendCode} from "@/apis/entrance/send-code";
 import {apiSendEmail} from "@/apis/entrance/send-email";
-import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
+import {ResponseToMessage, ReportErrorMessage} from "@/utils/notice";
 import {useRouter} from "vue-router";
 
 

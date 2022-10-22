@@ -25,7 +25,7 @@
 // 关键字
 import {computed, nextTick, onUnmounted, ref} from "vue";
 import {apiSearchUser} from "@/apis/user/search-user";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import {apiAddFriend} from "@/apis/friend/add-friend";
 import {useStore} from "vuex";
 import Bus from "@/utils/EventBus";

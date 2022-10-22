@@ -18,7 +18,7 @@
 
 <script setup>
 import {apiGetInfo} from "@/apis/user/get-info";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import {computed, onUnmounted, ref} from "vue";
 import {useStore} from "vuex";
 import UserInfoModify from "@/components/Widgets/UserProfile/UserInfoModify";

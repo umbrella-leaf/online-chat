@@ -44,7 +44,7 @@ import Bus from '@/utils/EventBus';
 import ToolTip from '@/components/Utils/ToolTip';
 import {apiSignIn} from "@/apis/entrance/sign-in";
 import md5 from 'js-md5';
-import {ResponseToMessage, ReportErrorMessage} from "@/utils/message";
+import {ResponseToMessage, ReportErrorMessage} from "@/utils/notice";
 
 
 const store = useStore();

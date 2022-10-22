@@ -34,7 +34,7 @@ import {chat_socket} from "@/utils/WebSocket";
 import MessageFrame from '../components/Widgets/ChatRoom/MessageFrame';
 import InputFrame from '../components/Widgets/ChatRoom/InputFrame';
 import {apiGetInfo} from "@/apis/user/get-info";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import UserInfoLeft from "@/components/Widgets/ChatRoom/UserInfoLeft";
 import SessionsList from "@/components/Widgets/ChatRoom/SessionsList";
 import UserInfoRight from "@/components/Widgets/ChatRoom/UserInfoRight";
@@ -167,8 +167,6 @@ chat_socket.on("out_of_chat", (data) => {
 
 // 聊天室id改变时重新获取消息
 watch(() => chat_id.value, (newVal, oldVal) => {
-  // 聊天窗口切换时清空输入
-  if (oldVal && newVal) Bus.$emit('ClearInput');
   // 之前是聊天窗口，就离开
   if (oldVal) {
     chat_socket.emit("leave", {chat_id: oldVal});
@@ -177,6 +175,8 @@ watch(() => chat_id.value, (newVal, oldVal) => {
   }
   // 进入新的聊天窗口就加入
   if (newVal) {
+    // 清空输入
+    Bus.$emit('ClearInput');
     chat_socket.emit("join", {chat_id: newVal, sender_id: cur_id.value, receiver_id: ChatUserInfo.value.id});
   }
 })

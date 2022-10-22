@@ -45,7 +45,7 @@ import dayjs from "dayjs";
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import {apiAcceptFriendApply} from "@/apis/friend/accept-friend-apply";
-import {ReportErrorMessage, ResponseToMessage} from "@/utils/message";
+import {ReportErrorMessage, ResponseToMessage} from "@/utils/notice";
 import Bus from "@/utils/EventBus";
 import {apiRefuseFriendApply} from "@/apis/friend/refuse-friend-apply";
 import {apiCancelFriendApply} from "@/apis/friend/cancel-friend-apply";

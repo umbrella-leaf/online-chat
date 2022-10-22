@@ -141,7 +141,7 @@ const wrapper = ref(document.body);
 const sidebarCollapsed = computed(() => props.sidebarCollapsed);
 const notificationsData = [
   {
-    title: 'New message from Sophie',
+    title: 'New notice from Sophie',
     img: 'images/face-1.jpg',
     time: '13 minutes ago',
   },
