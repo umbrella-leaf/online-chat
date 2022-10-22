@@ -9,25 +9,25 @@ import '@/utils/time';
 import './scss/app.scss';
 
 router.beforeEach((to, from, next) => {
-    if (to.fullPath) {
-        if (to.fullPath.includes("chat-room")) {
-            if (to.fullPath.match(/\d+/g)) {
-                // @ts-ignore
-                store.commit("chat/updateChatID" ,parseInt(to.fullPath.match(/\d+/g)[0]));
-            }
-            else {
-                store.commit("chat/resetChatID");
-                store.commit("chat/resetChatUserInfo");
-            }
-        } else {
-            store.commit("chat/resetChatID");
-            store.commit("chat/resetChatUserInfo");
-        }
-    } else {
+  if (to.fullPath) {
+    if (to.fullPath.includes("chat-room")) {
+      if (to.fullPath.match(/\d+/g)) {
+        // @ts-ignore
+        store.commit("chat/updateChatID" ,parseInt(to.fullPath.match(/\d+/g)[0]));
+      }
+      else {
         store.commit("chat/resetChatID");
         store.commit("chat/resetChatUserInfo");
+      }
+    } else {
+      store.commit("chat/resetChatID");
+      store.commit("chat/resetChatUserInfo");
     }
-    next();
+  } else {
+    store.commit("chat/resetChatID");
+    store.commit("chat/resetChatUserInfo");
+  }
+  next();
 })
 
 
