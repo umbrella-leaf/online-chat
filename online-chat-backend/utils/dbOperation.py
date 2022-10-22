@@ -6,7 +6,7 @@ from friend.model import FriendShip
 from chat.model import Chat, Message
 from emoji.model import Emoji
 from utils.Response import Response, Success, Error
-from utils.Enums import UserState, FriendState, MessageState
+from utils.Enums import UserState, FriendState, MessageState, MessageType
 from sqlalchemy import or_, and_, not_, func
 from time import time
 from datetime import datetime
@@ -279,7 +279,7 @@ class MySQL:
                 db.session.add(chat)
                 db.session.commit()
                 res = MySQL.sendNewMessage(chat_id=chat.id, content="我们已经是好友了，快来一起聊天吧！",
-                                           sender_id=friendship.user_id)
+                                           html="<p>我们已经是好友了，快来一起聊天吧！</p>", sender_id=friendship.user_id)
                 if res.status != 200:
                     return Error()
             return Success()
@@ -436,6 +436,7 @@ class MySQL:
             'id': message.id,
             'time': message.send_time,
             'content': message.content,
+            'html': message.html,
             'status': message.status,
             'type': message.type,
             'sender_id': message.sender_id,
@@ -474,7 +475,7 @@ class MySQL:
 
     # 发送聊天消息
     @staticmethod
-    def sendNewMessage(chat_id, content, sender_id, msg_type) -> Response:
+    def sendNewMessage(chat_id, content, html, sender_id, msg_type=MessageType.text.value) -> Response:
         try:
             chat = Chat.query.filter_by(id=chat_id).first()
             online = chat.online
@@ -483,7 +484,8 @@ class MySQL:
                 status = MessageState.unread.value
             else:
                 status = MessageState.read.value
-            message = Message(chat_id=chat_id, content=content, sender_id=sender_id, status=status, type=msg_type)
+            message = Message(chat_id=chat_id, content=content, html=html,
+                              sender_id=sender_id, status=status, type=msg_type)
             # 插入消息到Message表
             db.session.add(message)
             db.session.commit()
