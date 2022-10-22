@@ -1,6 +1,6 @@
 from exts import db
 from sqlalchemy import func, text
-from utils.Enums import MessageState
+from utils.Enums import MessageState, MessageType
 
 
 class Chat(db.Model):
@@ -25,9 +25,10 @@ class Message(db.Model):
     id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     chat_id = db.Column(db.Integer, db.ForeignKey('chat.id', ondelete='CASCADE'), nullable=False)
     send_time = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
-    content = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text(100000), nullable=False)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
     status = db.Column(db.Integer, nullable=False, server_default=text(str(MessageState.unread.value)))
+    type = db.Column(db.Integer, nullable=False, server_default=text(str(MessageType.text.value)))
     sender = db.relationship('User', backref="sends", foreign_keys=[sender_id])
     chat = db.relationship('Chat', backref="messages", foreign_keys=[chat_id])
 
