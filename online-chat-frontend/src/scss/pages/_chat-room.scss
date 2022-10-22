@@ -1,6 +1,6 @@
 .chatroom {
   background-color: #FFE4C4;
-  height: 650px;
+  height: 695px;
   border-radius: 8px !important;
   overflow-x: auto;
   .chatroom-left {
@@ -160,7 +160,7 @@
     >.ant-card {
       border-radius: 0;
       width: 95%;
-      height: 98%;
+      height: 100%;
     }
     .ant-card-grid {
       padding: 0;
@@ -260,6 +260,11 @@
           }
         }
         .main {
+          .text {
+            p {
+              margin-bottom: 0;
+            }
+          }
           .avatar {
             float: left;
             margin-left: 15px;
@@ -334,15 +339,15 @@
     }
     .input {
       position: relative;
-      height: 140px;
-      background: #fff;
+      height: 195px;
+      //background: #fff;
       .emoji-blank {
         position: relative;
         width: 100%;
         height: 35px;
         line-height: 35px;
         font-size: 12px;
-        padding: 0 30px;
+        padding: 0 20px;
         box-sizing: border-box;
         color: #7c7c7c;
         display: flex;
@@ -367,22 +372,27 @@
         }
       }
       .textarea {
-        box-sizing: border-box;
-        padding: 0 30px;
-        height: 70px;
-        width: 100%;
-        border: none;
-        outline: none;
-        resize: none;
-        font-family: 'Microsoft YaHei UI', serif;
-        font-weight: 400;
-        &.review {
-          white-space: pre-wrap;
-          overflow-y: auto;
+        .w-e-text-container {
+          margin: 0 8px;
+          p {
+            margin: 0 !important;
+            font-family: 'Microsoft YaHei UI', serif;
+            font-weight: 400;
+            line-height: 26px;
+          }
           img {
             width: 24px;
             height: 24px;
           }
+        }
+        .w-e-text-placeholder {
+          top: 0;
+        }
+        .w-e-select-list {
+          top: -390px;
+        }
+        .w-e-drop-panel {
+          top: -290px;
         }
       }
       .input-btn {
