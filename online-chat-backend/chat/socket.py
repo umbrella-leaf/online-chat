@@ -14,8 +14,17 @@ def handle_join(data):
     chat_id = data["chat_id"]
     sender_id = data["sender_id"]
     receiver_id = data["receiver_id"]
+    # 检查聊天是否存在
+    res = MySQL.checkChatExist(chat_id, sender_id)
+    if res.status != 200 or res.data != "normal":
+        emit("notice", {"notice": "聊天不存在！", "type": "error"}, room=sender_id)
+        return
+    # 加入聊天，聊天在线人数+1
+    res = MySQL.enterChatRoom(chat_id, sender_id)
+    if res.status != 200:
+        emit("notice", {"notice": "加入聊天失败！", "type": "error"}, room=sender_id)
+        return
     join_room(room=f'chat_{chat_id}')
-    MySQL.enterChatRoom(chat_id, sender_id)
     emit("updateMessageList", {"chat_id": chat_id}, room=f'chat_{chat_id}')
     emit("updateChatList", {"sender_id": sender_id, "receiver_id": receiver_id}, broadcast=True)
 
