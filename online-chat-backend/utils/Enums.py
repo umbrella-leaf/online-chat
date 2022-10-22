@@ -21,5 +21,11 @@ class MessageState(Enum):
     unread = 0
 
 
+class MessageType(Enum):
+    # 消息类型
+    text = 0
+    emoji = 1  # 1为纯表情
+
+
 if __name__ == '__main__':
     print(UserState.authorized.value)
