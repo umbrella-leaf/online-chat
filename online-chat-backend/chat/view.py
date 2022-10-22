@@ -3,6 +3,7 @@ from utils.dbOperation import MySQL
 from utils.Response import Response, Error, Success, Warn
 from exts import auth_token, db
 from chat.model import Chat, Message
+from utils.Enums import MessageType
 
 
 chat_route = Blueprint('chat', __name__)
@@ -56,6 +57,11 @@ def SendNewMessage(chat_id):
     sender_id = request.json.get('sender_id')
     if sender_id is None:
         return jsonify(Error(message="发送者ID不能为空!").to_dict())
+    msg_type = request.json.get('type')
+    if msg_type is None:
+        return jsonify(Error(message="消息类型不能为空!").to_dict())
+    if msg_type != MessageType.text.value and msg_type != MessageType.emoji.value:
+        return jsonify(Error(message="消息类型不存在!").to_dict())
     res = MySQL.checkChatExist(chat_id, cur_id)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
@@ -63,7 +69,7 @@ def SendNewMessage(chat_id):
         return jsonify(Warn(message="您已被好友删除！").to_dict())
     if res.data == "black":
         return jsonify(Warn(message="您已被好友屏蔽！").to_dict())
-    res = MySQL.sendNewMessage(chat_id, content, sender_id)
+    res = MySQL.sendNewMessage(chat_id, content, sender_id, msg_type)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="消息发送成功！").to_dict())
