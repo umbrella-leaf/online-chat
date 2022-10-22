@@ -149,9 +149,6 @@
             }
           }
         }
-        .ant-list-item-action {
-
-        }
       }
     }
   }
@@ -271,20 +268,26 @@
             width: 36px;
             height: 36px;
           }
+          .emoji {
+            margin-left: 10px;
+            max-width: 150px;
+            cursor: pointer;
+          }
           .content {
             display: inline-block;
             margin-left: 10px;
             position: relative;
-            padding: 4px 10px;
+            padding: 6px 10px;
             max-width: 350px;
             min-height: 36px;
-            line-height: 28px;
+            line-height: 24px;
             box-sizing: border-box;
             font-size: 14px;
             text-align: left;
             word-break: break-all;
             background-color: #fafafa;
             border-radius: 4px;
+            white-space: pre-wrap;
             img {
               width: 24px;
               height: 24px;
@@ -311,6 +314,7 @@
           }
           .content {
             background-color: #b2e281;
+            white-space: pre-wrap;
             &:before {
               right: -12px;
               vertical-align: middle;
@@ -373,10 +377,10 @@
         font-family: 'Microsoft YaHei UI', serif;
         font-weight: 400;
       }
-      .send {
+      .input-btn {
+        cursor: pointer;
         position: absolute;
         bottom: 5px;
-        right: 30px;
         width: 75px;
         height: 28px;
         line-height: 28px;
@@ -387,6 +391,12 @@
         background: #f5f5f5;
         font-size: 14px;
         color: #7c7c7c;
+        &.send {
+          right: 30px;
+        }
+        &.review {
+          right: 120px;
+        }
         &:hover {
           background: rgb(18,150,17);
           color: #fff;
@@ -436,7 +446,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    align-items: center;
+    align-content: flex-start;
     list-style: none;
     width: 340px;
     padding: 0;
@@ -448,6 +458,20 @@
       margin: 5px;
       height: 30px;
       width: 30px;
+      &.user {
+        width: 54px;
+        height: 57px;
+        img {
+          width: inherit;
+        }
+      }
+      &.user-upload {
+        border-radius: 8px;
+        border: 1px dashed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
     span {
       &.emoji {
