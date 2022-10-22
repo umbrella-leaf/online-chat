@@ -54,6 +54,9 @@ def SendNewMessage(chat_id):
     content = request.json.get('content')
     if content is None:
         return jsonify(Error(message="消息内容不能为空!").to_dict())
+    html = request.json.get('html')
+    if html is None:
+        return jsonify(Error(message="消息html不能为空!").to_dict())
     sender_id = request.json.get('sender_id')
     if sender_id is None:
         return jsonify(Error(message="发送者ID不能为空!").to_dict())
@@ -69,7 +72,7 @@ def SendNewMessage(chat_id):
         return jsonify(Warn(message="您已被好友删除！").to_dict())
     if res.data == "black":
         return jsonify(Warn(message="您已被好友屏蔽！").to_dict())
-    res = MySQL.sendNewMessage(chat_id, content, sender_id, msg_type)
+    res = MySQL.sendNewMessage(chat_id, content, html, sender_id, msg_type)
     if res.status != 200:
         return jsonify(Error.error.to_dict())
     return jsonify(Success(message="消息发送成功！").to_dict())
@@ -78,6 +81,7 @@ def SendNewMessage(chat_id):
 # 退出聊天室
 @chat_route.route('/close/<chat_id>', methods=['POST'])
 def CloseChatRoom(chat_id):
+    print(request.data)
     if chat_id:
         res = MySQL.leaveChatRoom(chat_id)
         if res.status != 200:
