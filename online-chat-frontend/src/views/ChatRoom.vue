@@ -166,6 +166,7 @@ chat_socket.on("out_of_chat", (data) => {
 watch(() => chat_id.value, (newVal, oldVal) => {
   // 之前是聊天窗口，就离开
   if (oldVal) {
+    MessageList.value = [];
     chat_socket.emit("leave", {cur_id: cur_id.value});
     const url = `${store.state.urls.backend_url}/chat/close/${oldVal}`;
     navigator.sendBeacon(url);
