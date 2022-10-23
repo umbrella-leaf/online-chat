@@ -1,6 +1,6 @@
 import base64
 
-from exts import db, cos
+from exts import db, cos, wcloud
 from user.model import User
 from friend.model import FriendShip
 from chat.model import Chat, Message
@@ -601,7 +601,7 @@ class MySQL:
 
     # 添加用户表情包
     @staticmethod
-    def addUserEmoji(user_id, emoji_base64):
+    def addUserEmoji(user_id, emoji_base64) -> Response:
         try:
             emoji_cnt = db.session.query(func.count(Emoji.id)).scalar()
             emoji_url = MySQL.processEmojiUrl(user_id, emoji_base64, emoji_cnt + 1)
@@ -615,4 +615,14 @@ class MySQL:
             MySQL.errOut(e)
             return Error()
 
+    # 生成词云
+    @staticmethod
+    def generateWordCloud(chat_id) -> Response:
+        try:
+            chat = Chat.query.filter_by(id=chat_id).first()
+            messages = [message.to_dict() for message in chat.messages]
+            return Success(data=wcloud.get_word_cloud(messages))
+        except Exception as e:
+            MySQL.errOut(e)
+            return Error()
 
