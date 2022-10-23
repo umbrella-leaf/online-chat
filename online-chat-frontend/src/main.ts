@@ -9,8 +9,10 @@ import '@/utils/time';
 import './scss/app.scss';
 
 router.beforeEach((to, from, next) => {
+  window.scrollTo(0, 0)
   if (to.fullPath) {
     if (to.fullPath.includes("chat-room")) {
+      window.scrollTo(0, 10);
       if (to.fullPath.match(/\d+/g)) {
         // @ts-ignore
         store.commit("chat/updateChatID" ,parseInt(to.fullPath.match(/\d+/g)[0]));
