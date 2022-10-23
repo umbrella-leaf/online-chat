@@ -37,15 +37,27 @@
         </template>
       </a-list>
     </a-spin>
+    <a-row justify="end" style="background-color: white">
+      <a-col :span="4">
+        <a-button block type="dashed" :disabled="!WordCloudAble" @click="ShowWordCloudImg">词云</a-button>
+      </a-col>
+      <a-col :span="4">
+        <a-button block type="dashed"><PlusOutlined /></a-button>
+      </a-col>
+    </a-row>
+    <WordCloudShow :visible="WordCloudImgVisible" />
   </div>
 </template>
 
 <script setup>
 import {useStore} from "vuex";
 import {useRouter, useRoute} from "vue-router";
-import {computed} from "vue";
+import {computed, onUnmounted, ref} from "vue";
 import {msgTimeFormat} from "@/utils/time/msgTimeFormat";
 import {emojiParse} from "@/utils/emojis/emojiParse";
+import {PlusOutlined} from '@ant-design/icons-vue';
+import WordCloudShow from "@/components/Widgets/ChatRoom/SessionsList/WordCloudShow";
+import Bus from "@/utils/EventBus";
 
 
 const store = useStore();
@@ -120,6 +132,34 @@ const JumpIntoChat = (item) => {
 const ChatSelected = (item) => {
   return item.chat?.id?.toString() === route.params.chat_id;
 }
+
+
+const chat_id = computed(() => store.state.chat.chat_id);
+// 可生成词云
+const WordCloudAble = computed(() => {
+  return chat_id.value !== 0;
+})
+// 词云图片框可见
+const WordCloudImgVisible = ref(false);
+// 展示词云框图片
+const ShowWordCloudImg = () => {
+  WordCloudImgVisible.value = true;
+  Bus.$emit("GenWordCloud");
+}
+// 关闭词云图片框
+const CloseWordCloudImg = () => {
+  WordCloudImgVisible.value = false;
+}
+
+// Bus挂载图片框关闭事件
+Bus.$on("CloseWordCloud", () => {
+  CloseWordCloudImg();
+})
+
+onUnmounted(() => {
+  Bus.$off("CloseWordCloud");
+})
+
 </script>
 
 <style scoped>
