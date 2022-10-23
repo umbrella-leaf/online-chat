@@ -17,7 +17,7 @@ def im_2_b64(image):
 class WordCloud:
     def __init__(self):
         self.wordcloud = wordcloud.WordCloud(font_path="msyh.ttc",
-                                             width=1000, height=700,
+                                             width=700, height=490,
                                              background_color='white',
                                              max_words=300)
         self.stop_words = ["图片", "表情", "图片表情"]
@@ -40,7 +40,6 @@ class WordCloud:
         words_txt = " ".join(words_list)
         # 生成词云照片
         self.wordcloud.generate(words_txt)
-        # self.wordcloud.to_file('yun.png')
         # 转化为base64格式
         matrix_RGB = self.wordcloud.to_array()
         image = Image.fromarray(matrix_RGB)
