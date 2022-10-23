@@ -1,5 +1,5 @@
 # 腾讯云数据万象（Cloud Infinity）服务，建立在对象存储COS服务之上
-from utils.COS_Service import COS
+from utils.Service.COS_Service import COS
 # from exts import cos
 
 
