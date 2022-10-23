@@ -80,7 +80,7 @@
     .sessions-list {
       margin-top: 20px;
       background: #ffffff;
-      height: 420px;
+      height: 460px;
       .chat-selected {
         background: rgb(222, 250, 255);
         .ant-list-item-meta-title span {
@@ -88,14 +88,14 @@
         }
       }
       .search-empty {
-        height: 420px;
+        height: 460px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-content: center;
       }
       .search-result {
-        height: 420px;
+        height: 460px;
         overflow-y: scroll;
         .ant-list-items {
           cursor: pointer;
