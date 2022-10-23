@@ -8,8 +8,8 @@ from utils.Enums import UserState, FriendState, MessageState, MessageType, Messa
 from sqlalchemy import or_, and_, not_, func
 from time import time
 from datetime import datetime
-from utils.Logger import logger
 import base64
+import traceback
 import re
 import pymysql
 
@@ -18,8 +18,9 @@ class MySQL:
     # 封装的报错函数
     @staticmethod
     def errOut(err):
-        # print(f"发生错误：{str(err)}")
-        logger.error(err, exc_info=True, stack_info=True)
+        print(f"发生错误：{str(err)}")
+        print(traceback.format_exc())
+        # logger.error(err, exc_info=True, stack_info=True)
 
     # 通过手机号+密码验证用户是否在数据库中
     @staticmethod
