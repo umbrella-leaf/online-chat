@@ -2,7 +2,7 @@
   <div class="message">
     <div class="message-wrapper" ref="msg_list">
       <ul>
-        <li v-for="(item, i) in FilterMessageList" class="message-item">
+        <li v-for="(item, i) in DisplayMessageList" class="message-item">
           <div class="time" v-if="item.type === 'showTime'"><span v-html="item.show"></span></div>
           <div class="main" :class="{self: IsSelfSend(item)}" v-else :key="item.id">
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
@@ -61,6 +61,21 @@ const IsRead = (item) => {
 const FilterMessageList = computed(() => {
   return msgTimeShowFilter(props.MessageList);
 })
+// 历史消息搜索关键字
+const search_keyword = ref('');
+// 历史消息搜索结果
+const SearchMessageList = computed(() => {
+  return msgTimeShowFilter(props.MessageList.filter((message) => {
+    return message.content.includes(search_keyword.value);
+  }))
+})
+// 最终展示的消息列表
+const DisplayMessageList = computed(() => {
+  if (search_keyword.value === '') return FilterMessageList.value;
+  return SearchMessageList.value;
+})
+
+
 // 下载表情图片
 const downloadImage = (fileUrl) => {
   const imgSrc = fileUrl;
@@ -93,9 +108,15 @@ const msg_list = ref();
 const msg_list_to_bottom = () => {
   nextTick(() => {msg_list.value.scrollTop = msg_list.value.scrollHeight;})
 }
+// Bus挂载消息框滚动到底部事件
 Bus.$on('MessageToBottom', msg_list_to_bottom);
+// Bus挂载历史消息搜索事件
+Bus.$on('SearchMessage', (keyword) => {
+  search_keyword.value = keyword;
+});
 onUnmounted(() => {
   Bus.$off('MessageToBottom');
+  Bus.$off('SearchMessage');
 })
 </script>
 
