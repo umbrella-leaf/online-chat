@@ -6,6 +6,7 @@ from utils.SMTP_Service import SMTP
 from utils.COS_Service import COS
 from utils.WordCloud_Service import WordCloud
 from utils.CI_Service import CI
+from utils.NLP_Service import NLP
 
 db = SQLAlchemy()
 
@@ -27,6 +28,9 @@ wcloud = WordCloud()
 
 # 初始化CI对象
 ci = CI(cos)
+
+# 初始化NLP对象
+nlp = NLP()
 
 # 初始化SocketIO对象
 socketio = SocketIO()
