@@ -1,12 +1,17 @@
 <template>
   <div class="input">
-    <div class="emoji-blank">
+    <div class="emoji-blank" id="emoji-blank">
       <keep-alive>
         <EmojiPicker>
           <FontIcons type="icon-emotion-line" title="表情"/>
         </EmojiPicker>
       </keep-alive>
-      <FontIcons type="icon-search" title="搜索聊天记录"/>
+      <a-popover trigger="click" @visibleChange="MessageSearchVisibleChange" :get-popup-container="() => wrapper">
+        <template #content>
+          <a-input-search enter-button ref="message_search" v-model:value="search_keyword" @change="SearchMessageByKeyword"/>
+        </template>
+        <FontIcons type="icon-search" title="搜索聊天记录"/>
+      </a-popover>
     </div>
     <ContentEditor class="textarea"/>
     <div class="input-btn send" @click="send" title="按enter键发送，按shift+enter换行">
@@ -21,7 +26,7 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onUnmounted, ref} from "vue";
+import {computed, nextTick, onMounted, onUnmounted, ref} from "vue";
 import Bus from "@/utils/EventBus";
 import {createFromIconfontCN} from '@ant-design/icons-vue';
 import {useStore} from "vuex";
@@ -97,6 +102,34 @@ const send = (param) => {
   }
 }
 
+// 历史消息搜索关键字
+const search_keyword = ref('');
+const message_search = ref();
+// 历史消息搜索popover可见性改变事件
+const MessageSearchVisibleChange = (visible) => {
+  if (visible) {
+    // 搜索框聚焦
+    nextTick(() => {
+      setTimeout(() => {
+        message_search.value.focus();
+      });
+    })
+  } else {
+    // 关闭popover时清空搜索框
+    message_search.value.blur();
+    search_keyword.value = '';
+    SearchMessageByKeyword();
+  }
+}
+// 搜索历史消息（通过关键字）
+const SearchMessageByKeyword = () => {
+  Bus.$emit("SearchMessage", search_keyword.value);
+  Bus.$emit("MessageToBottom");
+}
+// 搜索框包裹组件
+const wrapper = ref(document.body);
+
+
 // 发送文本消息
 Bus.$on('SendText', (param) => {
   send(param);
@@ -104,6 +137,9 @@ Bus.$on('SendText', (param) => {
 // 发送消息事件（用于直接发送用户表情包）
 Bus.$on('SendUserEmoji', (param) => {
   SendNewMessage(param, 1)
+})
+onMounted(() => {
+  wrapper.value = document.getElementById("emoji-blank");
 })
 onUnmounted(() => {
   Bus.$off('SendText');
