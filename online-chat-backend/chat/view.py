@@ -81,10 +81,28 @@ def SendNewMessage(chat_id):
 # 退出聊天室
 @chat_route.route('/close/<chat_id>', methods=['POST'])
 def CloseChatRoom(chat_id):
-    print(request.data)
     if chat_id:
         res = MySQL.leaveChatRoom(chat_id)
         if res.status != 200:
             return jsonify(Error.error.to_dict())
     return "已退出聊天"
 
+
+# 生成词云
+@chat_route.route('/gen-word-cloud/<chat_id>', methods=['GET'])
+@auth_token.login_required
+def GenerateWordCloud(chat_id):
+    cur_id = g.user_id
+    if chat_id is None:
+        return jsonify(Error(message="聊天ID不能为空!").to_dict())
+    res = MySQL.checkChatExist(chat_id, cur_id)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    if res.data == "delete":
+        return jsonify(Warn(message="您已被好友删除！").to_dict())
+    if res.data == "black":
+        return jsonify(Warn(message="您已被好友屏蔽！").to_dict())
+    res = MySQL.generateWordCloud(chat_id)
+    if res.status != 200:
+        return jsonify(Error.error.to_dict())
+    return jsonify(Success(message="词云生成成功！", data=res.data).to_dict())
