@@ -4,6 +4,7 @@ from flask_socketio import SocketIO
 from utils.SMS_Service import SMS
 from utils.SMTP_service import SMTP
 from utils.COS_service import COS
+from utils.WordCloud_service import WordCloud
 
 db = SQLAlchemy()
 
@@ -19,6 +20,9 @@ smtp = SMTP()
 
 # 初始化COS对象
 cos = COS()
+
+# 初始化词云对象
+wcloud = WordCloud()
 
 # 初始化SocketIO对象
 socketio = SocketIO()
