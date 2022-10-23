@@ -1,6 +1,6 @@
 from exts import db
 from sqlalchemy import func, text
-from utils.Enums import MessageState, MessageType
+from utils.Enums import MessageState, MessageType, MessageEmotion
 
 
 class Chat(db.Model):
@@ -30,6 +30,8 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
     status = db.Column(db.Integer, nullable=False, server_default=text(str(MessageState.unread.value)))
     type = db.Column(db.Integer, nullable=False, server_default=text(str(MessageType.text.value)))
+    sentiment = db.Column(db.Integer, nullable=False, server_default=text(str(MessageEmotion.neutral.value)))
+    degree = db.Column(db.DECIMAL, nullable=False, server_default=text('1'))
     sender = db.relationship('User', backref="sends", foreign_keys=[sender_id])
     chat = db.relationship('Chat', backref="messages", foreign_keys=[chat_id])
 
