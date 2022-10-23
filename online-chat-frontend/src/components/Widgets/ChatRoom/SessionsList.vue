@@ -42,7 +42,7 @@
         <a-button block type="dashed" :disabled="!WordCloudAble" @click="ShowWordCloudImg">词云</a-button>
       </a-col>
       <a-col :span="4">
-        <a-button block type="dashed"><PlusOutlined /></a-button>
+        <a-button block type="dashed" @click="router.push('/user-add')"><PlusOutlined /></a-button>
       </a-col>
     </a-row>
     <WordCloudShow :visible="WordCloudImgVisible" />
