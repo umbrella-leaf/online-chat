@@ -2,10 +2,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_socketio import SocketIO
 from utils.SMS_Service import SMS
-from utils.SMTP_service import SMTP
-from utils.COS_service import COS
-from utils.WordCloud_service import WordCloud
-from utils.CI_service import CI
+from utils.SMTP_Service import SMTP
+from utils.COS_Service import COS
+from utils.WordCloud_Service import WordCloud
+from utils.CI_Service import CI
 
 db = SQLAlchemy()
 
