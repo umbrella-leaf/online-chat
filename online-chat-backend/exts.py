@@ -5,6 +5,7 @@ from utils.SMS_Service import SMS
 from utils.SMTP_service import SMTP
 from utils.COS_service import COS
 from utils.WordCloud_service import WordCloud
+from utils.CI_service import CI
 
 db = SQLAlchemy()
 
@@ -23,6 +24,9 @@ cos = COS()
 
 # 初始化词云对象
 wcloud = WordCloud()
+
+# 初始化CI对象
+ci = CI(cos)
 
 # 初始化SocketIO对象
 socketio = SocketIO()
