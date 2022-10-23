@@ -19,7 +19,7 @@ class WordCloud:
         self.wordcloud = wordcloud.WordCloud(font_path="msyh.ttc",
                                              width=700, height=490,
                                              background_color='white',
-                                             max_words=300)
+                                             max_words=50)
         self.stop_words = ["图片", "表情", "图片表情"]
 
     def get_word_cloud(self, messages):
@@ -35,7 +35,7 @@ class WordCloud:
         jieba_res = jieba.lcut(string)
         words_list = []
         for res in jieba_res:
-            if res not in self.stop_words and len(res) >= 2:
+            if res not in self.stop_words and len(res) >= 3:
                 words_list.append(res)
         words_txt = " ".join(words_list)
         # 生成词云照片
