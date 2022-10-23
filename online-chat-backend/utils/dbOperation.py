@@ -1,10 +1,10 @@
-from exts import db, cos, wcloud, ci
+from exts import db, cos, wcloud, ci, nlp
 from user.model import User
 from friend.model import FriendShip
 from chat.model import Chat, Message
 from emoji.model import Emoji
 from utils.Response import Response, Success, Error
-from utils.Enums import UserState, FriendState, MessageState, MessageType
+from utils.Enums import UserState, FriendState, MessageState, MessageType, MessageEmotion
 from sqlalchemy import or_, and_, not_, func
 from time import time
 from datetime import datetime
@@ -438,6 +438,8 @@ class MySQL:
             'html': message.html,
             'status': message.status,
             'type': message.type,
+            'sentiment': message.sentiment,
+            'degree': message.degree,
             'sender_id': message.sender_id,
             'sender_avatar': message.sender.avatar_url
         }
@@ -483,10 +485,22 @@ class MySQL:
                 status = MessageState.unread.value
             else:
                 status = MessageState.read.value
-            # 过滤消息内容
-            content, html = ci.filter_text(message=content, html=html)
+            # 默认消息为中性，且程度为1
+            sentiment = MessageEmotion.neutral.value
+            degree = 1
+            # 消息如果是纯图就不进行情感分析和文本过滤
+            if content != "[图片表情]":
+                # 消息情感分析
+                res = nlp.GetEmotionAnalyzeRes(message=content)
+                if res.status != 200:
+                    return Error()
+                sentiment = res.data["sentiment"]
+                degree = res.data["degree"]
+                # 过滤消息内容
+                content, html = ci.filter_text(message=content, html=html)
             message = Message(chat_id=chat_id, content=content, html=html,
-                              sender_id=sender_id, status=status, type=msg_type)
+                              sender_id=sender_id, status=status, type=msg_type,
+                              sentiment=sentiment, degree=degree)
             # 插入消息到Message表
             db.session.add(message)
             db.session.commit()
