@@ -1,6 +1,4 @@
-import base64
-
-from exts import db, cos, wcloud
+from exts import db, cos, wcloud, ci
 from user.model import User
 from friend.model import FriendShip
 from chat.model import Chat, Message
@@ -11,6 +9,7 @@ from sqlalchemy import or_, and_, not_, func
 from time import time
 from datetime import datetime
 from utils.Logger import logger
+import base64
 import re
 import pymysql
 
@@ -484,6 +483,8 @@ class MySQL:
                 status = MessageState.unread.value
             else:
                 status = MessageState.read.value
+            # 过滤消息内容
+            content, html = ci.filter_text(message=content, html=html)
             message = Message(chat_id=chat_id, content=content, html=html,
                               sender_id=sender_id, status=status, type=msg_type)
             # 插入消息到Message表
@@ -625,4 +626,5 @@ class MySQL:
         except Exception as e:
             MySQL.errOut(e)
             return Error()
+
 
