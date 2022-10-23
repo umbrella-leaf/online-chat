@@ -1,0 +1,56 @@
+// =========================================================
+// Muse - Vue Ant Design Dashboard - v1.0.0
+// =========================================================
+
+// Product Page: https://www.creative-tim.com/product/vue-ant-design-dashboard
+// Copyright 2021 Creative Tim (https://www.creative-tim.com)
+// Coded by Creative Tim
+
+// =========================================================
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+
+// app.scss
+//
+// Template's man stylesheet.
+//
+
+// Base
+@import "base/variables";
+@import "base/utilities";
+@import "base/override";
+@import "base/typography";
+// / Base
+
+// Layouts
+@import "layouts/default";
+@import "layouts/entrance";
+// Layouts
+
+// Components
+@import "components/avatar";
+@import "components/badge";
+@import "components/button";
+@import "components/card";
+@import "components/chart";
+@import "components/list";
+@import "components/progress";
+@import "components/settings-drawer";
+@import "components/space";
+@import "components/table";
+@import "components/tag";
+@import "components/timeline";
+@import "components/widget";
+@import "components/dropdown";
+// / Components
+
+// Form
+@import "form/input";
+@import "form/checkbox";
+// / Form
+
+// Pages
+@import "pages/user-profile";
+@import "pages/chat-room";
+@import "pages/user-search";
+// Pages

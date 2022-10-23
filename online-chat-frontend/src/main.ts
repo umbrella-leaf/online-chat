@@ -6,7 +6,7 @@ import router from './router'
 import store from './store'
 import '@/utils/time';
 
-import './scss/app.scss';
+import './assets/scss/app.scss';
 
 router.beforeEach((to, from, next) => {
   if (to.fullPath) {
