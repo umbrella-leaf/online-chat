@@ -122,7 +122,6 @@ const changeEditStatus = (input, status) => {
   }
   if (input === 'sign') {
     SignatureEditing.value = status;
-    signature.value.focus();
     if (status) {
       nextTick(() => {signature.value.focus();})
     } else {
