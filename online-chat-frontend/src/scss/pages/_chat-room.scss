@@ -263,6 +263,49 @@
           .text {
             p {
               margin-bottom: 0;
+              span {
+                -webkit-text-fill-color: initial;
+              }
+            }
+            &.sentimental > p {
+              -webkit-background-clip:text;
+              -webkit-text-fill-color:transparent;
+            }
+            &.positive_10 > p {
+              background-image:-webkit-linear-gradient(left, #FF0000, #A52A2A, #800000);
+            }
+            &.positive_08 > p {
+              background-image:-webkit-linear-gradient(left, #FF7F50, #FF6347, #FF4500);
+            }
+            &.positive_06 > p {
+              background-image:-webkit-linear-gradient(left, #FF6699, #FF66CC, #FF66FF);
+            }
+            &.positive_04 > p {
+              background-image:-webkit-linear-gradient(left, #FF1493, #D87093, #C71585);
+            }
+            &.positive_02 > p {
+              background-image:-webkit-linear-gradient(left, #CC9900, #CC9933, #CC9966);
+            }
+            &.negative_10 > p {
+              background-image:-webkit-linear-gradient(left, #9400D3, #8A2BE2, #9932CC);
+            }
+            &.negative_08 > p {
+              background-image:-webkit-linear-gradient(left, #1E90FF, #4169E1, #0000CD);
+            }
+            &.negative_06 > p {
+              background-image:-webkit-linear-gradient(left, #87CEFA, #00BFFF, #6495ED);
+            }
+            &.negative_04 > p {
+              background-image:-webkit-linear-gradient(left, #20B2AA, #66CDAA, #3CB371);
+            }
+            &.negative_02 > p {
+              background-image:-webkit-linear-gradient(left, #00FF7F, #00FA9A, #ADFF2F);
+            }
+            &.neutral_05 > p {
+              background-image:-webkit-linear-gradient(left, #808080, #696969, rgba(0, 0, 0, 0.5));
+            }
+            &.neutral_10 > p {
+              background-image:-webkit-linear-gradient(left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85), black);
             }
           }
           .avatar {
