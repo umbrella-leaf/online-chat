@@ -24,7 +24,14 @@ class MessageState(Enum):
 class MessageType(Enum):
     # 消息类型
     text = 0
-    emoji = 1  # 1为纯表情
+    emoji = 1  # 1为纯表情图
+
+
+class MessageEmotion(Enum):
+    # 消息感情
+    positive = 1
+    neutral = 0
+    negative = -1
 
 
 if __name__ == '__main__':
