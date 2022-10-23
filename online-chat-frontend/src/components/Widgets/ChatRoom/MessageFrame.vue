@@ -8,7 +8,7 @@
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
             <span v-if="IsSelfSend(item)" class="unread">{{ IsRead(item) ? "已读" : "未读" }}</span>
             <div class="content" v-if="item.type === 0">
-              <div class="text" v-html="item.html"></div>
+              <div class="text" v-html="item.html" :class="SentimentStyle(item)"></div>
             </div>
             <a-dropdown :trigger="['contextmenu']" v-else >
               <template #overlay>
@@ -61,12 +61,30 @@ const IsRead = (item) => {
 const FilterMessageList = computed(() => {
   return msgTimeShowFilter(props.MessageList);
 })
-
+// 下载表情图片
 const downloadImage = (fileUrl) => {
   const imgSrc = fileUrl;
   const fileName = imgSrc.slice(imgSrc.lastIndexOf('/') + 1); // 下载文件的名字
-  console.log(imgSrc, fileName);
   downloadFile(imgSrc, fileName);
+}
+
+// 消息情感样式
+const SentimentStyle = (item) => {
+  return {
+    positive_02: item["sentiment"] === 1 && item["degree"] <= 0.2,
+    positive_04: item["sentiment"] === 1 && item["degree"] <= 0.4 && item["degree"] > 0.2,
+    positive_06: item["sentiment"] === 1 && item["degree"] <= 0.6 && item["degree"] > 0.4,
+    positive_08: item["sentiment"] === 1 && item["degree"] <= 0.8 && item["degree"] > 0.6,
+    positive_10: item["sentiment"] === 1 && item["degree"] > 0.8,
+    negative_02: item["sentiment"] === -1 && item["degree"] <= 0.2,
+    negative_04: item["sentiment"] === -1 && item["degree"] <= 0.4 && item["degree"] > 0.2,
+    negative_06: item["sentiment"] === -1 && item["degree"] <= 0.6 && item["degree"] > 0.4,
+    negative_08: item["sentiment"] === -1 && item["degree"] <= 0.8 && item["degree"] > 0.6,
+    negative_10: item["sentiment"] === -1 && item["degree"] > 0.8,
+    neutral_05: item["sentiment"] === 0 && item["degree"] <= 0.5,
+    neutral_10: item["sentiment"] === 0 && item["degree"] > 0.5,
+    sentimental: true
+  }
 }
 
 // 获取消息框组件
