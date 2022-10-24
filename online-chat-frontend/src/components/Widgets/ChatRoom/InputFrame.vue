@@ -85,10 +85,14 @@ const SendNewMessage = (param, type=0) => {
 }
 const send = (param) => {
   const { content, html } = param;
+  // 消息为空判断
+  const MessageEmpty = (content) => {
+    return content.replace(/&nbsp;/g, "").trim().length === 0;
+  }
   // 在聊天室内才发送
   if (chat_id.value) {
-    // 如果消息为空（文本内容空且html消息无表情）
-    if (content.replace(/(^\s*)|(\s*$)/g, "").length === 0 && !html.includes("<img")) {
+    // 如果消息为空
+    if (MessageEmpty(content)) {
       warn.value = true;
       Bus.$emit('ClearInput');
       setTimeout(() => {
