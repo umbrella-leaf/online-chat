@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Online-chat在线聊天室-邮箱验证</title>
+</head>
+<body>
+    {% if state == 'success' %}
+    <div class="notice-card success">
+        <img src="{{ url_for('static', filename='notice/成功.png') }}" />
+        <span>{{ result }}</span>
+    </div>
+    {% elif state == 'warning' %}
+    <div class="notice-card warning">
+        <img src="{{ url_for('static', filename='notice/提示.png') }}" />
+        <span>{{ result }}</span>
+    </div>
+    {% else %}
+    <div class="notice-card error">
+        <img src="{{ url_for('static', filename='notice/警示.png') }}" />
+        <span>{{ result }}</span>
+    </div>
+    {% endif %}
+</body>
+<style>
+    body {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    .notice-card {
+        margin-top: 80px;
+        width: 1100px;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+    }
+    .success {
+        background-color: #f6ffed;
+        border: 1px solid #b7eb8f;
+    }
+    .warning {
+        background-color: #fffbe6;
+        border: 1px solid #ffe58f;
+    }
+    .error {
+        background-color: #fff2f0;
+        border: 1px solid #ffccc7;
+    }
+    img {
+        width: 140px;
+        height: 140px;
+    }
+    span {
+        font-size: 30px;
+        font-weight: 400;
+    }
+</style>
+</html>
