@@ -13,7 +13,7 @@
     :style="{ backgroundColor: 'transparent' }">
     <div class="brand">
       <img src="images/logo-ct-black.png" alt="">
-      <span>Online Chat</span>
+      <span>Online-Chat 在线聊天</span>
     </div>
     <hr>
     <a-menu theme="light" mode="inline" selectable :selected-keys="selectedKeys">
