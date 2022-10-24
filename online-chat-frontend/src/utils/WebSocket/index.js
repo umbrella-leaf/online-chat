@@ -7,7 +7,7 @@ function InitialSocket(module) {
 
 export const chat_socket = InitialSocket("chat");
 chat_socket.on("connect", () => {
-  chat_socket.emit("join_self", {cur_id: store.state.user.info.id});
+
 })
 
 chat_socket.on("disconnect", () => {
