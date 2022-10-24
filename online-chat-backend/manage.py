@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, g, request, make_response
+from flask import Flask, jsonify, g, request
 from flask_cors import CORS
 from utils.Response import Success, Warn, Error
 from utils.Token import Token
@@ -13,7 +13,7 @@ import chat.socket
 import config
 import re
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/")
 app.config.from_object(config)
 app.secret_key = '\xc9ixnRb\xe40\xd4\xa5\x7f\x03\xd0y6\x01\x1f\x96\xeao+\x8a\x9f\xe4'
 db.init_app(app)
