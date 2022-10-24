@@ -27,7 +27,7 @@ service.interceptors.request.use(
     return config;
   },
   function (error) {
-    console.log(error);
+    // console.log(error);
     return Promise.reject(error);
   }
 )
@@ -53,7 +53,7 @@ service.interceptors.response.use(
     return response;
   },
   function (error) {
-    console.log(error);
+    // console.log(error);
     return Promise.reject(error);
   }
 )
