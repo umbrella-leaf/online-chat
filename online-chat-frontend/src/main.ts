@@ -8,10 +8,10 @@ import '@/utils/time';
 
 import './assets/scss/app.scss';
 
-document.title = "eba项目管理系统"
+document.title = "Online-chat在线聊天室-"
 
 router.beforeEach((to, from, next) => {
-  if (to.meta?.title) document.title = "eba项目管理系统-" + to.meta.title
+  if (to.meta?.title) document.title = "Online-chat在线聊天室-" + to.meta.title
   if (to.fullPath) {
     if (to.fullPath.includes("chat-room")) {
       if (to.fullPath.match(/\d+/g)) {
