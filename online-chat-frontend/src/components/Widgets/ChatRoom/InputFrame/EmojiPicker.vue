@@ -38,7 +38,7 @@ const getUserEmojiList = () => {
     })
     .catch(error => {
       ReportErrorMessage(error);
-      console.log(error);
+      // console.log(error);
     })
 }
 getUserEmojiList();

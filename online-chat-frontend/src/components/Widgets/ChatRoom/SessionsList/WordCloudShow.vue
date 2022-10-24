@@ -43,7 +43,7 @@ const GenWordCloudImg = () => {
     })
     .catch(error => {
       WordCloudLoading.value = false;
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }

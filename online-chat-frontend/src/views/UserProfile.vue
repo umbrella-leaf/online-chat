@@ -67,7 +67,7 @@ const GetFriendList = () => {
       loading.value = false;
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
       loading.value = false;
     })
@@ -90,7 +90,7 @@ const GetIntimacyRank = () => {
       loading1.value = false;
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }

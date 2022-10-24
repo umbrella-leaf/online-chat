@@ -45,6 +45,7 @@ import ToolTip from '@/components/Utils/ToolTip';
 import {apiSignIn} from "@/apis/entrance/sign-in";
 import md5 from 'js-md5';
 import {ResponseToMessage, ReportErrorMessage} from "@/utils/notice";
+import {chat_socket} from "@/utils/WebSocket";
 
 
 const store = useStore();
@@ -92,6 +93,7 @@ const SignIn = (value) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         store.commit('user/updateToken', response.data.data['token']);
+        chat_socket.emit("join_self", {cur_id: response.data.data['user_id']});
         router.push('/chat-room');
       }
     })

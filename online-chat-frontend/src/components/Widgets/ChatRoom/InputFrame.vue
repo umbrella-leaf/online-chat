@@ -78,7 +78,7 @@ const SendNewMessage = (param, type=0) => {
         }
       })
       .catch(error => {
-        console.log(error);
+        // console.log(error);
         ReportErrorMessage(error);
       })
   }

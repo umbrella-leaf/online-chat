@@ -58,7 +58,7 @@ const GetUserInfo = () => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }
@@ -87,11 +87,16 @@ const GetChatList = () => {
       ResponseToMessage(response, false);
       if (response.data.status === 200) {
         ChatList.value = response.data.data;
+        if (chat_id.value) {
+          store.commit("chat/updateChatUserInfo", ChatList.value.filter((item) => {
+            return item["chat"].id === chat_id.value;
+          })[0]["friend"]);
+        }
       }
       loading.value = false;
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
       loading.value = false;
     })
@@ -125,7 +130,7 @@ const GetMessageList = (chat_id) => {
       RefreshFrame();
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
       RefreshFrame();
     })

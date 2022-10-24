@@ -72,7 +72,7 @@ const SearchUsers = (search_source) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
       loading.value = false;
     })
@@ -101,7 +101,7 @@ const SendFriendApply = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }

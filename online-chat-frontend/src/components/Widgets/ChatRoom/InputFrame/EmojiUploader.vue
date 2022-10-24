@@ -137,7 +137,7 @@ const uploadUserEmoji = () => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }

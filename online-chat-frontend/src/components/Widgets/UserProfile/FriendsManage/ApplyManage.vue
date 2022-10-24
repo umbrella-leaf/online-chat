@@ -104,7 +104,7 @@ const AcceptFriendApply = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }
@@ -124,7 +124,7 @@ const RefuseFriendApply = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }
@@ -138,7 +138,7 @@ const CancelFriendApply = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }

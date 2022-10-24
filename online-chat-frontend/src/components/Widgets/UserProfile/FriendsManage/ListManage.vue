@@ -117,7 +117,7 @@ const BlackFriend = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }
@@ -138,7 +138,7 @@ const WhiteFriend = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }
@@ -162,7 +162,7 @@ const DeleteFriend = (item) => {
       }
     })
     .catch(error => {
-      console.log(error);
+      // console.log(error);
       ReportErrorMessage(error);
     })
 }
