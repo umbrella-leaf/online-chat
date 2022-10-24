@@ -54,6 +54,12 @@ const handleCreated = (editor) => {
 // 编辑器模式
 const mode = ref('default');
 
+const SendMessage = () => {
+  // 获取纯文本
+  const content = htmlUnParse(valueHtml.value);
+  const html = valueHtml.value;
+  Bus.$emit('SendText', {html, content});
+}
 // 按回车发送
 // 按Shift+Enter换行
 const onKeyDown = (e) => {
@@ -62,12 +68,7 @@ const onKeyDown = (e) => {
   }
   if (e.keyCode === 13) {
     e.preventDefault();
-    const editor = editorRef.value;
-    if (editor === null) return;
-    // 获取纯文本
-    const content = htmlUnParse(valueHtml.value);
-    const html = valueHtml.value;
-    Bus.$emit('SendText', {html, content});
+    SendMessage();
   }
 }
 
@@ -86,6 +87,10 @@ Bus.$on('InsertDefaultEmoji', (emoji) => {
   editor.focus();
   editor.dangerouslyInsertHtml(emoji);
 })
+// Bus挂载按钮发送消息事件
+Bus.$on('SendMessageByBtn', () => {
+  SendMessage();
+})
 
 
 // 组件销毁时，也及时销毁编辑器
@@ -96,6 +101,7 @@ onBeforeUnmount(() => {
   Bus.$off('InputFocus');
   Bus.$off('ClearInput');
   Bus.$off('InsertDefaultEmoji');
+  Bus.$off('SendMessageByBtn');
 })
 
 </script>

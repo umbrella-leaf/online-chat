@@ -14,7 +14,7 @@
       </a-popover>
     </div>
     <ContentEditor class="textarea"/>
-    <div class="input-btn send" @click="send" title="按enter键发送，按shift+enter换行">
+    <div class="input-btn send" @click="Bus.$emit('SendMessageByBtn')" title="按enter键发送，按shift+enter换行">
       <span>发送（S）</span>
     </div>
     <transition name="appear">

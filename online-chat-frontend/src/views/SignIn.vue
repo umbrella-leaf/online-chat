@@ -93,8 +93,8 @@ const SignIn = (value) => {
       ResponseToMessage(response);
       if (response.data.status === 200) {
         store.commit('user/updateToken', response.data.data['token']);
-        chat_socket.emit("join_self", {cur_id: response.data.data['user_id']});
         router.push('/chat-room');
+        chat_socket.emit("join_self", {cur_id: response.data.data['user_id']});
       }
     })
     .catch(error => {
