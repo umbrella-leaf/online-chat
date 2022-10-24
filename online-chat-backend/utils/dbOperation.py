@@ -524,8 +524,9 @@ class MySQL:
         try:
             # 聊天室在线人数+1
             chat = Chat.query.filter_by(id=chat_id).first()
-            chat.online += 1
-            db.session.commit()
+            if chat.online < 2:
+                chat.online += 1
+                db.session.commit()
             # 所有我收到的消息(不是我发送的）设为已读
             messages = chat.messages
             for message in messages:
