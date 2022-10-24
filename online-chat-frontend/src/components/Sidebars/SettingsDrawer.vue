@@ -21,11 +21,11 @@
 
     <!-- Settings Drawer Content -->
     <div class="drawer-content">
-      <h6>Configurator</h6>
-      <p>See our dashboard options.</p>
+      <h6>界面主题配置</h6>
+      <p>您可以在此配置以下选项</p>
       <hr>
       <div class="sidebar-color">
-        <h6>Sidebar Color</h6>
+        <h6>侧边栏颜色设置</h6>
         <a-radio-group v-model:value="sidebarColorModel" @change="updateSidebarColor" defaultValue="primary">
           <a-radio-button value="primary" class="bg-primary"></a-radio-button>
           <a-radio-button value="secondary" class="bg-secondary"></a-radio-button>
@@ -36,15 +36,15 @@
         </a-radio-group>
       </div>
       <div class="sidenav-type">
-        <h6>Sidenav Type</h6>
-        <p>Choose between 2 different sidenav types.</p>
+        <h6>侧边栏主题设置</h6>
+        <p>在两种不同的主题背景之中切换</p>
         <a-radio-group button-style="solid" v-model:value="sidebarThemeModel" @change="updateSidebarTheme" defaultValue="primary">
-          <a-radio-button value="light">TRANSPARENT</a-radio-button>
-          <a-radio-button value="white">WHITE</a-radio-button>
+          <a-radio-button value="light">透明背景</a-radio-button>
+          <a-radio-button value="white">白色背景</a-radio-button>
         </a-radio-group>
       </div>
       <div class="navbar-fixed">
-        <h6>Navbar Fixed</h6>
+        <h6>顶栏固定设置</h6>
         <a-switch default-checked v-model:checked="navbarFixedModel" @change="toggleNavbarPosition" />
       </div>
     </div>
