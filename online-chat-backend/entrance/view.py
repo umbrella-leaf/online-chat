@@ -31,7 +31,7 @@ def signIn():
         return jsonify(Error.error.to_dict())
     token = res.data
 
-    res_data = {'token': token}
+    res_data = {'token': token, 'user_id': user_id}
     return jsonify(Success(data=res_data, message='登录成功！').to_dict())
 
 
