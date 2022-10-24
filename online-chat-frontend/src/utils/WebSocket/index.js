@@ -11,5 +11,5 @@ chat_socket.on("connect", () => {
 })
 
 chat_socket.on("disconnect", () => {
-  chat_socket.emit("leave_self", {cur_id: store.state.user.info.id});
+  // chat_socket.emit("leave_self", {cur_id: store.state.user.info.id});
 })
