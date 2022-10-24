@@ -8,7 +8,10 @@ import '@/utils/time';
 
 import './assets/scss/app.scss';
 
+document.title = "eba项目管理系统"
+
 router.beforeEach((to, from, next) => {
+  if (to.meta?.title) document.title = "eba项目管理系统-" + to.meta.title
   if (to.fullPath) {
     if (to.fullPath.includes("chat-room")) {
       if (to.fullPath.match(/\d+/g)) {
@@ -33,7 +36,7 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   window.scrollTo(0, 0);
   if (to.fullPath && to.fullPath.includes("chat-room")) {
-    window.scrollBy(0, 20);
+    window.scrollTo(0, 20);
   }
 })
 
