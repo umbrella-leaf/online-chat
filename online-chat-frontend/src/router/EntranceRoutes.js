@@ -3,11 +3,13 @@ export const EntranceRoutes = [
   {
     path: '/sign-in',
     name: '登录',
+    meta: {title: '登录'},
     component: () => import(/* webpackChunkName: "about" */ '../views/SignIn')
   },
   {
     path: '/sign-up',
     name: '注册',
+    meta: {title: '注册'},
     component: () => import('../views/SignUp')
   }
 ]
