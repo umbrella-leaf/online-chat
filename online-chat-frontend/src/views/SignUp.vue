@@ -129,7 +129,7 @@ const resetForm = () => {
 // 自定义密码验证（这一动作包含了修改密码时调用确认密码的验证）
 const validatePassword = async(_rule, value) => {
   if (FormState.password.trim() === '') {
-    return Promise.reject('密码不能为空！');
+    return Promise.reject('密码必须包含数字、字母、字符其中任意两种及以上，且长度在8-20之间');
   }
   const pattern = /^(?![0-9]+$)(?![a-zA-Z]+$)(?!([^(0-9a-zA-Z)])+$)\S{8,20}$/;
   if (!(pattern.test(value))) {
@@ -292,7 +292,7 @@ const validFailed = ({values, errorFields, outOfDate}) => {
 const rules = {
   // 用户名验证规则，只能包含汉字、数字、字母及下划线，且长度在2-15之间
   username: [{required: true, whitespace: true, message: '用户名不能为空！'},
-    {pattern: /^[\p{Unified_Ideograph}0-9a-zA-Z_]{2,15}$/u, message: '用户名格式不正确'}],
+    {pattern: /^[\p{Unified_Ideograph}0-9a-zA-Z_]{2,15}$/u, message: '用户名只能包含汉字、数字、字母及下划线，且长度在2-15之间'}],
   // 密码验证规则，必须包含数字、字母、字符两种及以上，且在8-20位之间
   password: [{required:true, whitespace:true, validator:validatePassword, trigger:'change'}],
   // 确认密码验证规则，必须和输入密码一致
