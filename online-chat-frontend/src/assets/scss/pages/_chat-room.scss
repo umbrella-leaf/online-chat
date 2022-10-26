@@ -263,13 +263,14 @@
           .text {
             p {
               margin-bottom: 0;
-              span {
+              span > u, span > s {
                 -webkit-text-fill-color: initial;
+                //text-decoration-color: initial;
               }
             }
             &.sentimental > p {
               -webkit-background-clip:text;
-              -webkit-text-fill-color:transparent;
+              -webkit-text-fill-color:rgba(0, 0, 0, 0.2);
             }
             &.positive_10 > p {
               background-image:-webkit-linear-gradient(left, #FF0000, #A52A2A, #800000);
@@ -296,10 +297,10 @@
               background-image:-webkit-linear-gradient(left, #87CEFA, #00BFFF, #6495ED);
             }
             &.negative_04 > p {
-              background-image:-webkit-linear-gradient(left, #20B2AA, #66CDAA, #3CB371);
+              background-image:-webkit-linear-gradient(left, #0000CD, #4169E1, #1E90FF);
             }
             &.negative_02 > p {
-              background-image:-webkit-linear-gradient(left, #00FF7F, #00FA9A, #ADFF2F);
+              background-image:-webkit-linear-gradient(left, #6495ED, #00BFFF, #87CEFA);
             }
             &.neutral_05 > p {
               background-image:-webkit-linear-gradient(left, #808080, #696969, rgba(0, 0, 0, 0.5));
