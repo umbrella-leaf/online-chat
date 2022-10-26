@@ -129,11 +129,11 @@ const resetForm = () => {
 // 自定义密码验证（这一动作包含了修改密码时调用确认密码的验证）
 const validatePassword = async(_rule, value) => {
   if (FormState.password.trim() === '') {
-    return Promise.reject('密码必须包含数字、字母、字符其中任意两种及以上，且长度在8-20之间');
+    return Promise.reject('密码不能为空！');
   }
   const pattern = /^(?![0-9]+$)(?![a-zA-Z]+$)(?!([^(0-9a-zA-Z)])+$)\S{8,20}$/;
   if (!(pattern.test(value))) {
-    return Promise.reject('密码格式不正确！');
+    return Promise.reject('密码必须包含数字、字母、字符其中任意两种及以上，且长度在8-20之间');
   }
   if (FormState.checkPassword !== '') {
     formRef.value.validateFields('checkPassword')
