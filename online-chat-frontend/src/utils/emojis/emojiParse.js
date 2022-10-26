@@ -23,3 +23,11 @@ export function emojiParse(message) {
   return message
     .replace(/\[\p{Unified_Ideograph}+\]/ug, getWeChatEmojiUrl).replace(/<\p{Unified_Ideograph}+>/ug, getQQEmojiUrl);
 }
+
+// 补充：显示带有经典emoji的消息是，给emoji包裹一层div
+export function classicEmojiWrap(message) {
+  return message
+    .replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/g, (emoji) => {
+      return `<span>${emoji}</span>`
+    })
+}

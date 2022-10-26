@@ -8,7 +8,7 @@
             <a-avatar class="avatar" :src="item.sender_avatar"  alt=""/>
             <span v-if="IsSelfSend(item)" class="unread">{{ IsRead(item) ? "已读" : "未读" }}</span>
             <div class="content" v-if="item.type === 0">
-              <div class="text" v-html="item.html" :class="SentimentStyle(item)"></div>
+              <div class="text" v-html="classicEmojiWrap(item.html)" :class="SentimentStyle(item)"></div>
             </div>
             <a-dropdown :trigger="['contextmenu']" v-else >
               <template #overlay>
@@ -35,6 +35,7 @@ import {useStore} from "vuex";
 import {msgTimeShowFilter} from "@/utils/time/msgTimeShowFilter";
 import {DownloadOutlined} from "@ant-design/icons-vue";
 import {downloadFile} from "@/utils/emojis/download";
+import {classicEmojiWrap} from "@/utils/emojis/emojiParse";
 
 
 const store = useStore();
@@ -96,9 +97,7 @@ const SentimentStyle = (item) => {
     negative_06: item["sentiment"] === -1 && item["degree"] <= 0.6 && item["degree"] > 0.4,
     negative_08: item["sentiment"] === -1 && item["degree"] <= 0.8 && item["degree"] > 0.6,
     negative_10: item["sentiment"] === -1 && item["degree"] > 0.8,
-    neutral_05: item["sentiment"] === 0 && item["degree"] <= 0.5,
-    neutral_10: item["sentiment"] === 0 && item["degree"] > 0.5,
-    sentimental: true
+    sentimental: item["sentiment"] !== 0
   }
 }
 

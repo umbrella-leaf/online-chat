@@ -263,7 +263,7 @@
           .text {
             p {
               margin-bottom: 0;
-              span > u, span > s {
+              span {
                 -webkit-text-fill-color: initial;
                 //text-decoration-color: initial;
               }
@@ -301,12 +301,6 @@
             }
             &.negative_02 > p {
               background-image:-webkit-linear-gradient(left, #6495ED, #00BFFF, #87CEFA);
-            }
-            &.neutral_05 > p {
-              background-image:-webkit-linear-gradient(left, #808080, #696969, rgba(0, 0, 0, 0.5));
-            }
-            &.neutral_10 > p {
-              background-image:-webkit-linear-gradient(left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85), black);
             }
           }
           .avatar {
