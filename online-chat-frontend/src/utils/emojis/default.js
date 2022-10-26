@@ -271,10 +271,7 @@ export const ClassicEmojisMap = {
   "🚹": "emojib_170",
   "🚺": "emojib_171",
   "⭕": "emojib_172",
-  "✖": "emojib_173",
-  "©": "emojib_174",
-  "®": "emojib_175",
-  "™": "emojib_176"
+  "✖": "emojib_173"
 }
 
 export const QQEmojisMap = {
