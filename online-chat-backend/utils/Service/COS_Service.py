@@ -42,6 +42,14 @@ class COS:
         url = re.sub(r"^https.*com", self.cdn_base_url, url)
         return url
 
+    def object_exist(self, key):
+        # 判断文件是否存在
+        response = self.client.object_exists(
+            Bucket=self.bucket,
+            Key=key
+        )
+        return response
+
 
 if __name__ == '__main__':
     myCos = COS()
