@@ -150,6 +150,9 @@ class MySQL:
         ext_begin = avatar_base64.find('/')
         ext_end = avatar_base64.find(";", ext_begin)
         ext = avatar_base64[ext_begin + 1:ext_end]
+        # 若无用户头像文件夹，先建立
+        if not cos.object_exist(f"/online-chat/avatar/{telephone}/"):
+            cos.upload_object(b'', f"/online-chat/avatar/{telephone}/")
         # 是base64则转换并上传
         if avatar_base64.find('base64') != -1:
             # 拼接文件路径
@@ -607,6 +610,9 @@ class MySQL:
         ext_begin = emoji_base64.find('/')
         ext_end = emoji_base64.find(";", ext_begin)
         ext = emoji_base64[ext_begin + 1:ext_end]
+        # 若没有用户表情包文件夹，先创建
+        if not cos.object_exist(f"/online-chat/emojis/user_{user_id}/"):
+            cos.upload_object(b'', f"/online-chat/emojis/user_{user_id}/")
         # 拼接获得表情包路径
         emoji_name = f"/online-chat/emojis/user_{user_id}/emoji_{emoji_id}.{ext}"
         b = base64.b64decode(emoji_base64[ext_end + 8:])
